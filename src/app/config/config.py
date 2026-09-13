@@ -43,5 +43,7 @@ class Config(BaseSettings):
     REFRESH_TOKEN_EXPIRE: timedelta = timedelta(days=30)
     CRYPT_ALGORITHM: str = "HS256"
 
+    BASE_STORAGE_URL: str = r"Movie Reservation System\storage"
+
 
 config = Config()

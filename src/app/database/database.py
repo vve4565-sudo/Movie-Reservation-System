@@ -2,7 +2,7 @@ from collections.abc import AsyncGenerator
 
 from config.config import config
 from config.security import hash_password
-from database.models import User
+from database.models import Roles, User
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
@@ -32,6 +32,7 @@ async def init_db():
                 password_hash=await hash_password(
                     config.SUPERUSER_PASSWORD,
                 ),
+                Role=Roles.admin,
                 is_active=True,
                 is_superuser=True,
             )

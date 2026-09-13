@@ -20,4 +20,6 @@ dependencies = [
     "uvicorn>=0.52.4",
     "jwt>=1.4.0",
     "pyjwt>=2.14.0",
+    "python-multipart>=0.0.32",
+    "aiofiles>=25.1.0",
 ]

@@ -38,3 +38,7 @@ async def get_refresh_token(id: UUID):
         config.CRYPT_ALGORITHM,
     )
     return refresh_token
+
+
+async def decode_token(token: str):
+    return jwt.decode(token, config.JWT_SECRET_KEY, config.CRYPT_ALGORITHM)

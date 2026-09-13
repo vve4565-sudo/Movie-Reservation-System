@@ -1,6 +1,6 @@
 from datetime import datetime
 from enum import StrEnum
-from uuid import UUID, uuid4
+from uuid import UUID, uuid7
 
 from sqlalchemy import DateTime, ForeignKey, String, func
 from sqlalchemy.orm import (
@@ -24,7 +24,7 @@ class Base(DeclarativeBase): ...
 class IDMixin:
     id: Mapped[UUID] = mapped_column(
         primary_key=True,
-        default=uuid4,
+        default=uuid7,
         autoincrement=False,
         index=True,
         unique=True,
