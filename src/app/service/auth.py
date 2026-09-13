@@ -30,8 +30,10 @@ class AuthService:
         if not user:
             await verify_password(credentials.password, dummy_hash)
             return None
+            # raise Exception("Нет пользователя")
 
-        if not await verify_password(credentials.password, user.password_hash):
+        elif not await verify_password(credentials.password, user.password_hash):
             return None
+            # raise Exception("неверный пароль")
 
         return user

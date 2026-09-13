@@ -31,4 +31,4 @@ class UserRepository:
             User.email == credentials.email,
         )
         user = await self.session.execute(query)
-        return user.scalar_one_or_none()
+        return user.scalar()
