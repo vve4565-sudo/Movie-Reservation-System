@@ -1,9 +1,12 @@
+import logging
 from dataclasses import dataclass
 
 from database.models import Roles, User
 from schemas.auth import AuthCreds, HashedAuthCreds, HashedCredentials
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+
+lg = logging.getLogger(__name__)
 
 
 @dataclass
@@ -14,6 +17,7 @@ class UserRepository:
         self,
         credentials: HashedCredentials,
     ) -> User:
+        lg.info("create user with data", extra=credentials.model_dump())
         user = User(
             nickname=credentials.nickname,
             email=credentials.email,
@@ -27,6 +31,7 @@ class UserRepository:
         return user
 
     async def select_user(self, credentials: AuthCreds) -> User | None:
+        lg.info("select user with data", extra=credentials.model_dump())
         query = select(User).where(
             User.email == credentials.email,
         )

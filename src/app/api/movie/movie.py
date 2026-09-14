@@ -1,34 +1,59 @@
+import logging
 from typing import Annotated
 from uuid import UUID
 
 from api.Depends import current_user_is_admin, get_movie_service
 from database.models import User
-from fastapi import APIRouter, Depends, UploadFile, status
+from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
 from schemas.movie import MovieImage, MovieImagePatch, MoviePatch, NewMovie, OutputMovie
 from service.movie import MovieService
 
+from ...exceptions.movie import ImageSaveError
+
 router = APIRouter(prefix="/movies")
+lg = logging.getLogger(__name__)
 
 
 @router.get("/")
-async def get_allowed_movies(
+async def get_movies(
     movie_service: Annotated[MovieService, Depends(get_movie_service)],
     cursor: str | None = None,
     limit: int = 10,
 ) -> tuple[list[OutputMovie], UUID]:
+
+    lg.info("get movies with params", extra={"cursor": cursor, "limit": limit})
     result = await movie_service.get_movies(limit, cursor)
+    lg.info("success movie select")
     return result  # type: ignore
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
 async def new_movie(
+    image: Annotated[UploadFile, File()],
+    title: Annotated[str, Form()],
+    description: Annotated[str, Form()],
+    genre: Annotated[str, Form()],
+    director: Annotated[str, Form()],
     admin: Annotated[User, Depends(current_user_is_admin)],
-    data: NewMovie,
-    image: UploadFile,
     movie_service: Annotated[MovieService, Depends(get_movie_service)],
 ):
+    lg.info("serialize file as image")
     movie_image = MovieImage(image=await image.read(), title=image.filename)  # type: ignore
-    id = await movie_service.new_movie(data, movie_image)
+    data = NewMovie(
+        title=title,
+        description=description,
+        genre=genre,
+        director=director,
+    )
+    lg.info("create movie with data", extra=data.model_dump())
+    try:
+        id = await movie_service.new_movie(data, movie_image)
+
+    except ImageSaveError:
+        lg.exception("movie image save error", extra={"title": movie_image.title})
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    lg.info("success movie create", extra={"id": id})
     return id
 
 
@@ -46,9 +71,16 @@ async def patch_movie_data(
     if not data:
         data = MoviePatch()
 
+    lg.info("serialize file as image")
     movie_image = MovieImagePatch(image=await image.read(), title=image.filename)  # type: ignore
 
-    id = await movie_service.patch_movie_data(UUID(id), data, movie_image)  # type: ignore
+    lg.info("create movie with data", extra=data.model_dump())
+    try:
+        id = await movie_service.patch_movie_data(UUID(id), data, movie_image)  # type: ignore
+    except ImageSaveError:
+        lg.exception("movie image save error", extra={"title": movie_image.title})
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    lg.info("success movie create", extra={"id": id})
     return id
 
 
@@ -58,5 +90,7 @@ async def delete_movie(
     admin: Annotated[User, Depends(current_user_is_admin)],
     movie_service: Annotated[MovieService, Depends(get_movie_service)],
 ):
+    lg.info("delete movie with id", extra={"id": id})
     await movie_service.delete_movie(UUID(id))
+    lg.info("success movie delete", extra={"id": id})
     return

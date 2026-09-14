@@ -12,3 +12,4 @@ wheels/
 .idea/
 .ruff_cache/
 storage/
+s.py

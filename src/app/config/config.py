@@ -1,4 +1,6 @@
+import sys
 from datetime import timedelta
+from enum import StrEnum
 from pathlib import Path
 
 from pydantic import PostgresDsn, computed_field
@@ -43,7 +45,38 @@ class Config(BaseSettings):
     REFRESH_TOKEN_EXPIRE: timedelta = timedelta(days=30)
     CRYPT_ALGORITHM: str = "HS256"
 
-    BASE_STORAGE_URL: str = r"Movie Reservation System\storage"
+    BASE_STORAGE_URL: str = str(ROOT_DIR) + r"/storage"
+
+    class LOGGER_LEVEL(StrEnum):
+        INFO = "INFO"
+        DEBUG = "DEBUG"
+        ERROR = "ERROR"
+        CRITICAL = "CRITICAL"
+
+    LOGGING_CONFIG = {
+        "version": 1,
+        "disable_existing_loggers": False,
+        # Форматирование: определяем, какие поля из LogRecord попадут в JSON
+        "formatters": {
+            "json": {
+                "()": "pythonjsonlogger.jsonlogger.JsonFormatter",
+                "format": "%(asctime)s %(levelname)s %(name)s %(message)s %(filename)s %(lineno)d",
+            },
+        },
+        # Обработчики: куда отправляем логи (по 12-Factor App — в stdout)
+        "handlers": {
+            "stdout": {
+                "class": "logging.StreamHandler",
+                "stream": sys.stdout,
+                "formatter": "json",
+            },
+        },
+        # Корневой логгер
+        "root": {
+            "level": "INFO",
+            "handlers": ["stdout"],
+        },
+    }
 
 
 config = Config()

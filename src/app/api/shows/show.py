@@ -1,13 +1,17 @@
+import logging
 from datetime import datetime
 from typing import Annotated
 from uuid import UUID
 
 from api.Depends import current_user_is_admin, get_show_service
 from database.models import User
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from service.show import ShowService
 
+from ...exceptions.show import ShowsNotExists
+
 router = APIRouter(prefix="/shows", tags=["show"])
+lg = logging.getLogger(__name__)
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
@@ -18,7 +22,13 @@ async def new_show(
     finish: datetime,
     show_service: Annotated[ShowService, Depends(get_show_service)],
 ):
+    lg.info(
+        "create show with data",
+        extra={"movie_id": movie_id, "start": start, "finish": finish},
+    )
+
     id = await show_service.create_show(UUID(movie_id), start, finish)
+    lg.info("success show create", extra={"id": id})
     return id
 
 
@@ -28,7 +38,13 @@ async def get_show(
     id: str,
     show_service: Annotated[ShowService, Depends(get_show_service)],
 ):
-    result = await show_service.get_show(UUID(id))
+    lg.info("get show with id", extra={"id": id})
+    try:
+        result = await show_service.get_show(UUID(id))
+    except ShowsNotExists:
+        lg.exception("show not exists", extra={"id": id})
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    lg.info("success show select")
     return result
 
 
@@ -38,12 +54,19 @@ async def delete_show(
     id: str,
     show_service: Annotated[ShowService, Depends(get_show_service)],
 ):
-    return await show_service.delete_show(UUID(id))
+    lg.info("delete show with id", extra={"id": id})
+    result = await show_service.delete_show(UUID(id))
+    lg.info("success show delete", extra={"id": id})
+    return result
 
-@router.get('/avalabile')
+
+@router.get("/avalabile")
 async def get_all_shows(
     show_service: Annotated[ShowService, Depends(get_show_service)],
     start: datetime = datetime.now(),
     finish: datetime | None = None,
 ):
-    return await show_service.get_all_shows(start, finish)
+    lg.info("get all shows with params", extra={"start": start, "finish": finish})
+    result = await show_service.get_all_shows(start, finish)
+    lg.info("success show select")
+    return result

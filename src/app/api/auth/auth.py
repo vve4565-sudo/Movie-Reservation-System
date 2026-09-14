@@ -1,13 +1,16 @@
+import logging
 from typing import Annotated
 from uuid import UUID
 
 from api.Depends import get_auth_service
 from config.security import decode_token, get_access_token, get_refresh_token
+from exceptions.auth import UserAlreadyExists, UserNotExists, WrongPassword
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from schemas.auth import AuthCreds, FullCredentials, OutputUser
 from service.auth import AuthService
 
 router = APIRouter(prefix="/auth", tags=["auth"])
+lg = logging.getLogger(__name__)
 
 
 @router.post("/registration", status_code=status.HTTP_201_CREATED)
@@ -16,9 +19,16 @@ async def registration(
     response: Response,
     auth_service: Annotated[AuthService, Depends(get_auth_service)],
 ) -> OutputUser:
-    user = await auth_service.register_user(credentials)
 
-    if not user:
+    lg.info("Registration attempt for email=%s", credentials.email)
+
+    try:
+        user = await auth_service.register_user(credentials)
+    except UserAlreadyExists as e:
+        lg.warning(
+            "Registration failed: user already exists, email=%s", credentials.email
+        )
+
         raise HTTPException(status.HTTP_403_FORBIDDEN, "User already exists")
 
     access_token = await get_access_token(user.id)
@@ -33,6 +43,8 @@ async def registration(
         httponly=True,
     )
 
+    lg.info("Registration succeeded for user_id=%s", user.id)
+
     return user
 
 
@@ -42,11 +54,27 @@ async def login(
     auth_service: Annotated[AuthService, Depends(get_auth_service)],
     response: Response,
 ) -> OutputUser:
-    print(credentials.email, credentials.password)
-    user = await auth_service.authenticate_user(credentials)
 
-    if not user:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "User not exists")
+    lg.info("Login attempt for email=%s", credentials.email)
+
+    try:
+        user = await auth_service.authenticate_user(credentials)
+
+    except UserNotExists as e:
+        lg.warning(
+            "Login failed: user not exists, email=%s",
+            credentials.email,
+            extra={"email": credentials.email},
+        )
+        raise HTTPException(status.HTTP_403_FORBIDDEN, "User not exists")
+
+    except WrongPassword as e:
+        lg.warning(
+            "Login failed: wrong password, email=%s",
+            credentials.email,
+            extra={"email": credentials.email},
+        )
+        raise HTTPException(status.HTTP_403_FORBIDDEN, "Wrong password")
 
     access_token = await get_access_token(user.id)
     refresh_token = await get_refresh_token(user.id)
@@ -59,11 +87,17 @@ async def login(
         secure=True,
         httponly=True,
     )
+
+    lg.info("Login succeeded for user_id=%s", user.id)
+
     return user
 
 
 @router.get("/logout")
 async def logout(response: Response):
+
+    lg.info("Logout request received")
+
     response.headers["Authorization"] = ""
     response.delete_cookie("refresh_token")
     return
@@ -71,8 +105,13 @@ async def logout(response: Response):
 
 @router.get("/refresh")
 async def refresh_access_token(request: Request, response: Response):
+
+    lg.info("Token refresh request received")
+
     old_refresh_token = request.cookies.get("refresh_token")
     if not old_refresh_token:
+        lg.warning("Token refresh failed: refresh token missing")
+
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "refresh token expired")
     decoded_token = await decode_token(old_refresh_token)
     uuid = UUID(decoded_token.get("sub"))
@@ -86,3 +125,5 @@ async def refresh_access_token(request: Request, response: Response):
         secure=True,
         httponly=True,
     )
+
+    lg.info("Token refresh succeeded for user_id=%s", uuid, extra={"id": uuid})

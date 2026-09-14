@@ -1,6 +1,7 @@
 from contextlib import asynccontextmanager
 
-from api import AuthRouter, MovieRouter
+import config.logging
+from api import AuthRouter, MovieRouter, ShowRouter
 from database.database import init_db
 from fastapi import FastAPI
 
@@ -14,3 +15,4 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 app.include_router(AuthRouter)
 app.include_router(MovieRouter)
+app.include_router(ShowRouter)
