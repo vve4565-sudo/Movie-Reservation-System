@@ -1,0 +1,49 @@
+from collections.abc import Sequence
+from dataclasses import dataclass
+from datetime import datetime
+from uuid import UUID
+
+from database.models import Movie, Show
+from sqlalchemy import delete, select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+
+@dataclass
+class ShowRepository:
+    session: AsyncSession
+
+    async def create_show(
+        self,
+        movie_id: UUID,
+        start: datetime,
+        finish: datetime,
+    ) -> UUID:
+        show = Show(movie_id=movie_id, start=start, finish=finish)
+        self.session.add(show)
+        await self.session.commit()
+        return show.id
+
+    async def get_show(self, id: UUID) -> Show | None:
+        query = select(Show).where(Show.id == id)
+        result = await self.session.execute(query)
+        return result.scalar_one_or_none()
+
+    async def delete_show(self, id: UUID) -> None:
+        query = delete(Show).where(Show.id == id)
+        await self.session.execute(query)
+        return
+
+    async def get_all_shows(
+        self,
+        start: datetime,
+        finish: datetime | None = None,
+    ) -> Sequence[Show]:
+
+        query = select(Show).where(Show.start <= start)
+        if finish:
+            query = query.where(Show.finish == finish)
+
+        query = query.join(Movie)
+        result = await self.session.execute(query)
+
+        return result.scalars().all()
