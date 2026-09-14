@@ -53,7 +53,7 @@ class ShowRepository:
         lg.info("get all shows with params", extra={"start": start, "finish": finish})
         query = select(Show).where(Show.start <= start)
         if finish:
-            query = query.where(Show.finish == finish)
+            query = query.where(Show.finish <= finish)
 
         query = query.join(Movie)
         result = await self.session.execute(query)

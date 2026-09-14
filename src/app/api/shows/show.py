@@ -5,10 +5,9 @@ from uuid import UUID
 
 from api.Depends import current_user_is_admin, get_show_service
 from database.models import User
+from exceptions.show import ShowsNotExists
 from fastapi import APIRouter, Depends, HTTPException, status
 from service.show import ShowService
-
-from ...exceptions.show import ShowsNotExists
 
 router = APIRouter(prefix="/shows", tags=["show"])
 lg = logging.getLogger(__name__)

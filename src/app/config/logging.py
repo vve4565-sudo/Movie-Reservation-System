@@ -1,10 +1,10 @@
 from logging import getLogger
 from logging.config import dictConfig
 
-from .config import config
+from config.config import LOGGER_LEVEL, LOGGING_CONFIG
 
-dictConfig(config.LOGGING_CONFIG)
+dictConfig(LOGGING_CONFIG)
 
 lg = getLogger("app")
 
-lg.setLevel(config.LOGGER_LEVEL.DEBUG)
+lg.setLevel(LOGGER_LEVEL.DEBUG)

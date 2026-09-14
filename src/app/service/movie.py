@@ -1,16 +1,13 @@
 import logging
-from base64 import urlsafe_b64decode, urlsafe_b64encode
-from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import Any
 from uuid import UUID
 
 from aiofiles import open
 from config.config import config
+from database.models import Movie
+from exceptions.movie import ImageSaveError
 from repository.movie import MovieRepository
 from schemas.movie import MovieImage, MovieImagePatch, MoviePatch, NewMovie
-
-from ..exceptions.movie import ImageSaveError
 
 lg = logging.getLogger(__name__)
 
@@ -19,21 +16,13 @@ lg = logging.getLogger(__name__)
 class MovieService:
     movie_repository: MovieRepository
 
-    async def get_movies(
-        self, limit: int, cursor: str | None
-    ) -> tuple[Sequence[Any], bytes]:
-        lg.info("get movie list with data", extra={"limit": limit, "cursor": cursor})
-        decoded_cursor = None
+    async def get_movies(self, id: UUID) -> Movie:
 
-        if cursor:
-            decoded_cursor = UUID(bytes=urlsafe_b64decode(cursor))
+        lg.info("get movie by id", extra={"id": str(id)})
+        result = await self.movie_repository.get_movie_by_id(id)
+        lg.info("success movie select")
 
-        result, new_cursor = await self.movie_repository.get_movies(
-            limit, decoded_cursor
-        )
-        encoded_cursor = urlsafe_b64encode(str(new_cursor).encode())
-        lg.info("success movie list", extra={"count": len(result)})
-        return result, encoded_cursor
+        return result
 
     async def new_movie(self, data: NewMovie, image: MovieImage) -> UUID:
         lg.info("create movie with data", extra=data.model_dump())

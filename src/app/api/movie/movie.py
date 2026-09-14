@@ -4,25 +4,22 @@ from uuid import UUID
 
 from api.Depends import current_user_is_admin, get_movie_service
 from database.models import User
+from exceptions.movie import ImageSaveError
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
 from schemas.movie import MovieImage, MovieImagePatch, MoviePatch, NewMovie, OutputMovie
 from service.movie import MovieService
 
-from ...exceptions.movie import ImageSaveError
-
-router = APIRouter(prefix="/movies")
+router = APIRouter(prefix="/movies", tags=["movie"])
 lg = logging.getLogger(__name__)
 
 
 @router.get("/")
 async def get_movies(
-    movie_service: Annotated[MovieService, Depends(get_movie_service)],
-    cursor: str | None = None,
-    limit: int = 10,
-) -> tuple[list[OutputMovie], UUID]:
+    movie_service: Annotated[MovieService, Depends(get_movie_service)], id: str
+) -> OutputMovie:
 
-    lg.info("get movies with params", extra={"cursor": cursor, "limit": limit})
-    result = await movie_service.get_movies(limit, cursor)
+    lg.info("get movie by id", extra={"id": id})
+    result = await movie_service.get_movies(UUID(id))
     lg.info("success movie select")
     return result  # type: ignore
 
