@@ -6,10 +6,12 @@ from database.database import get_session
 from database.models import Roles, User
 from fastapi import Depends, HTTPException, Request, status
 from repository.movie import MovieRepository
+from repository.reservation import ReservationRepository
 from repository.show import ShowRepository
 from repository.user import UserRepository
 from service.auth import AuthService
 from service.movie import MovieService
+from service.reservation import ReservationService
 from service.show import ShowService
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -64,3 +66,17 @@ async def get_show_service(
     show_repository: Annotated[ShowRepository, Depends(get_show_repository)],
 ):
     return ShowService(show_repository)
+
+
+async def get_reservation_repository(session: SessionDep):
+    return ReservationRepository(session)
+
+
+async def get_reservation_service(
+    reservation_repository: Annotated[
+        ReservationRepository, Depends(get_reservation_repository)
+    ],
+):
+    return ReservationService(reservation_repository)
+
+

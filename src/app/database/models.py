@@ -69,15 +69,12 @@ class Hall(IDMixin, Base):
     __tablename__ = "hall"
 
     chair_number: Mapped[int] = mapped_column()
-    show_id: Mapped[UUID] = mapped_column(ForeignKey(Show.id))
-    reservarion_id: Mapped[UUID] = mapped_column(ForeignKey("reservations.id"))
-    reservation: Mapped[bool]
+    hall_number: Mapped[int]
 
 
 class Reservation(IDMixin, Base):
     __tablename__ = "reservations"
+
     show_id: Mapped[UUID] = mapped_column(ForeignKey(Show.id))
     user_id: Mapped[UUID] = mapped_column(ForeignKey(User.id))
-    chair_id: Mapped[UUID] = mapped_column(ForeignKey(Hall.id))
-    start: Mapped[datetime] = mapped_column()
-    finish: Mapped[datetime] = mapped_column()
+    hall_id: Mapped[UUID] = mapped_column(ForeignKey(Hall.id))
