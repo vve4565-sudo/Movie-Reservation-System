@@ -10,11 +10,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 class ReservationRepository:
     session: AsyncSession
 
-    async def new_reservation(self, show_id: UUID, user_id: UUID, hall_id: UUID):
+    async def new_reservation(self, show_id: UUID, user_id: UUID, chair_id: UUID):
         new_reservation = Reservation(
             show_id=show_id,
             user_id=user_id,
-            hall_id=hall_id,
+            chair_id=chair_id,
         )
         self.session.add(new_reservation)
         await self.session.commit()

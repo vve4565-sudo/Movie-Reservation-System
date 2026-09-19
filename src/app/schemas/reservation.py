@@ -6,4 +6,4 @@ from pydantic import BaseModel, ConfigDict
 class SNewReservation(BaseModel):
     show_id: UUID
     user_id: UUID
-    hall_id: UUID
+    chair_id: UUID

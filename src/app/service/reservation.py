@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from uuid import UUID
 
+from exceptions.reservation import ReservationNotExists
 from repository.reservation import ReservationRepository
 
 
@@ -8,11 +9,11 @@ from repository.reservation import ReservationRepository
 class ReservationService:
     reservation_repository: ReservationRepository
 
-    async def new_reservation(self, show_id: UUID, user_id: UUID, hall_id: UUID):
+    async def new_reservation(self, show_id: UUID, user_id: UUID, chair_id: UUID):
         return await self.reservation_repository.new_reservation(
             show_id,
             user_id,
-            hall_id,
+            chair_id,
         )
 
     async def get_all_reservations(self):
@@ -23,7 +24,7 @@ class ReservationService:
         if result:
             return result
 
-        raise Exception()
+        raise ReservationNotExists("Reservation not exist")
 
     async def delete_reservation(self, reservation_id: UUID):
         return await self.reservation_repository.delete_reservation(reservation_id)

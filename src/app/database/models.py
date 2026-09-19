@@ -66,10 +66,16 @@ class Show(IDMixin, Base):
 
 
 class Hall(IDMixin, Base):
-    __tablename__ = "hall"
+    __tablename__ = "halls"
 
-    chair_number: Mapped[int] = mapped_column()
     hall_number: Mapped[int]
+
+
+class Chair(IDMixin, Base):
+    __tablename__ = "chairs"
+
+    hall_id: Mapped[UUID] = mapped_column(ForeignKey(Hall.id))
+    chair_number: Mapped[int]
 
 
 class Reservation(IDMixin, Base):
@@ -77,4 +83,4 @@ class Reservation(IDMixin, Base):
 
     show_id: Mapped[UUID] = mapped_column(ForeignKey(Show.id))
     user_id: Mapped[UUID] = mapped_column(ForeignKey(User.id))
-    hall_id: Mapped[UUID] = mapped_column(ForeignKey(Hall.id))
+    chair_id: Mapped[UUID] = mapped_column(ForeignKey(Chair.id))
