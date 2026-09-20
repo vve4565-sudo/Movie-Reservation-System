@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from uuid import UUID
 
-from database.models import Hall, Movie, Reservation, Show
+from database.models import Chair, Movie, Reservation, Show, User
 from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -21,17 +21,17 @@ class ReservationRepository:
         return new_reservation.id
 
     async def get_all_reservations(self):
-        query = select(Reservation).join(Hall).join(Movie).join(Show)
+        query = select(Reservation).join(Chair).join(Show).join(User)
         result = await self.session.execute(query)
         return result.scalars().all()
 
-    async def get_reservation_by_id(self, hall_id: UUID):
+    async def get_reservation_by_id(self, show_id: UUID):
         query = (
             select(Reservation)
-            .where(Reservation.hall_id == hall_id)
-            .join(Hall)
-            .join(Movie)
+            .where(Reservation.show_id == show_id)
+            .join(Chair)
             .join(Show)
+            .join(User)
         )
         result = await self.session.execute(query)
         return result.scalar_one_or_none()

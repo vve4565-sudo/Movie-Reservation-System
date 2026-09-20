@@ -49,13 +49,13 @@ class ShowRepository:
         self,
         start: datetime,
         finish: datetime | None = None,
-    ) -> Sequence[Show]:
+    ) -> list[Show]:
         lg.info("get all shows with params", extra={"start": start, "finish": finish})
-        query = select(Show).where(Show.start <= start)
+        query = select(Show).where(Show.start >= start)
         if finish:
             query = query.where(Show.finish <= finish)
 
         query = query.join(Movie)
         result = await self.session.execute(query)
         lg.info("success show select")
-        return result.scalars().all()
+        return list(result.scalars().all())

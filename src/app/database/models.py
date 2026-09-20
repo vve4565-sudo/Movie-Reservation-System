@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 from enum import StrEnum
 from uuid import UUID, uuid7
@@ -56,6 +57,16 @@ class Movie(IDMixin, Base):
     genre: Mapped[str] = mapped_column()
     director: Mapped[str] = mapped_column()
 
+    def to_bytes(self):
+        return json.dumps({
+            "id": str(self.id),
+            "title": self.title,
+            "description": self.description,
+            "image": self.image,
+            "genre": self.genre,
+            "director": self.director,
+        }).encode()
+
 
 class Show(IDMixin, Base):
     __tablename__ = "shows"
@@ -63,6 +74,14 @@ class Show(IDMixin, Base):
     movie_id: Mapped[UUID] = mapped_column(ForeignKey(Movie.id))
     start: Mapped[datetime] = mapped_column()
     finish: Mapped[datetime] = mapped_column()
+
+    def to_bytes(self):
+        return json.dumps({
+            "id": str(self.id),
+            "movie_id": str(self.movie_id),
+            "start": str(self.start),
+            "finish": str(self.finish),
+        }).encode()
 
 
 class Hall(IDMixin, Base):
@@ -84,3 +103,11 @@ class Reservation(IDMixin, Base):
     show_id: Mapped[UUID] = mapped_column(ForeignKey(Show.id))
     user_id: Mapped[UUID] = mapped_column(ForeignKey(User.id))
     chair_id: Mapped[UUID] = mapped_column(ForeignKey(Chair.id))
+
+    def to_bytes(self):
+        return json.dumps({
+            "id": str(self.id),
+            "show_id": str(self.show_id),
+            "user_id": str(self.user_id),
+            "chair_id": str(self.chair_id),
+        }).encode()

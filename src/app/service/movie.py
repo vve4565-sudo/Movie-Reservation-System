@@ -16,7 +16,7 @@ lg = logging.getLogger(__name__)
 class MovieService:
     movie_repository: MovieRepository
 
-    async def get_movies(self, id: UUID) -> Movie:
+    async def get_movie(self, id: UUID) -> Movie:
 
         lg.info("get movie by id", extra={"id": str(id)})
         result = await self.movie_repository.get_movie_by_id(id)

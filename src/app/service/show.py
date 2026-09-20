@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from uuid import UUID
 
+from config.redis import cache_decorator
 from database.models import Show
 from exceptions.show import ShowsNotExists
 from repository.show import ShowRepository
@@ -43,6 +44,7 @@ class ShowService:
         lg.info("success show delete", extra={"id": id})
         return result
 
+    @cache_decorator(module="shows")
     async def get_all_shows(
         self,
         start: datetime,

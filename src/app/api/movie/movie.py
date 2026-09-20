@@ -15,11 +15,12 @@ lg = logging.getLogger(__name__)
 
 @router.get("/")
 async def get_movies(
-    movie_service: Annotated[MovieService, Depends(get_movie_service)], id: str
+    movie_service: Annotated[MovieService, Depends(get_movie_service)],
+    id: str,
 ) -> OutputMovie:
 
     lg.info("get movie by id", extra={"id": id})
-    result = await movie_service.get_movies(UUID(id))
+    result = await movie_service.get_movie(UUID(id))
     lg.info("success movie select")
     return result  # type: ignore
 

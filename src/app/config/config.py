@@ -47,11 +47,15 @@ class Config(BaseSettings):
 
     BASE_STORAGE_URL: str = str(ROOT_DIR) + r"/storage"
 
+    REDIS_PASSWORD: str
+
+
 class LOGGER_LEVEL(StrEnum):
     INFO = "INFO"
     DEBUG = "DEBUG"
     ERROR = "ERROR"
     CRITICAL = "CRITICAL"
+
 
 LOGGING_CONFIG = {
     "version": 1,

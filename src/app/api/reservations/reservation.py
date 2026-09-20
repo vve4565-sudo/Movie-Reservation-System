@@ -32,12 +32,12 @@ async def get_reservations(
 
 @router.get("/{hall_id}")
 async def get_reservation_by_id(
-    hall_id: UUID,
+    show_id: UUID,
     reservation_service: Annotated[
         ReservationService, Depends(get_reservation_service)
     ],
 ):
-    return await reservation_service.get_reservation_by_id(hall_id)
+    return await reservation_service.get_reservation_by_id(show_id)
 
 
 @router.delete("/{reservation_id}", status_code=status.HTTP_204_NO_CONTENT)
