@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from uuid import UUID
 
-from config.redis import cache_decorator
 from exceptions.reservation import ReservationNotExists
 from repository.reservation import ReservationRepository
 
@@ -17,7 +16,6 @@ class ReservationService:
             chair_id,
         )
 
-    @cache_decorator(module="reservations")
     async def get_all_reservations(self):
         return await self.reservation_repository.get_all_reservations()
 

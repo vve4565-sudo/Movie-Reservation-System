@@ -4,7 +4,7 @@ from uuid import UUID
 
 from api.Depends import current_user_is_admin, get_movie_service
 from database.models import User
-from exceptions.movie import ImageSaveError
+from exceptions.movie import ImageSaveError, InvalidImageExtensionError
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
 from schemas.movie import MovieImage, MovieImagePatch, MoviePatch, NewMovie, OutputMovie
 from service.movie import MovieService
@@ -13,8 +13,8 @@ router = APIRouter(prefix="/movies", tags=["movie"])
 lg = logging.getLogger(__name__)
 
 
-@router.get("/")
-async def get_movies(
+@router.get("/{id}")
+async def get_movie_by_id(
     movie_service: Annotated[MovieService, Depends(get_movie_service)],
     id: str,
 ) -> OutputMovie:
@@ -35,7 +35,7 @@ async def new_movie(
     admin: Annotated[User, Depends(current_user_is_admin)],
     movie_service: Annotated[MovieService, Depends(get_movie_service)],
 ):
-    lg.info("serialize file as image")
+    lg.info("serialize file as MovieImage object")
     movie_image = MovieImage(image=await image.read(), title=image.filename)  # type: ignore
     data = NewMovie(
         title=title,
@@ -50,6 +50,10 @@ async def new_movie(
     except ImageSaveError:
         lg.exception("movie image save error", extra={"title": movie_image.title})
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    except InvalidImageExtensionError:
+        lg.exception("invalid image extension")
+        raise HTTPException(status.HTTP_400_BAD_REQUEST)
 
     lg.info("success movie create", extra={"id": id})
     return id
@@ -92,3 +96,13 @@ async def delete_movie(
     await movie_service.delete_movie(UUID(id))
     lg.info("success movie delete", extra={"id": id})
     return
+
+
+@router.get("/")
+async def get_movies(
+    movie_service: Annotated[MovieService, Depends(get_movie_service)],
+):
+    lg.info("select all movies")
+    result = await movie_service.get_movies()
+    lg.info("success select movies")
+    return result

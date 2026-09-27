@@ -5,9 +5,11 @@ from uuid import UUID
 from aiofiles import open
 from config.config import config
 from database.models import Movie
-from exceptions.movie import ImageSaveError
+from exceptions.movie import ImageSaveError, InvalidImageExtensionError
 from repository.movie import MovieRepository
 from schemas.movie import MovieImage, MovieImagePatch, MoviePatch, NewMovie
+
+from config.redis import movie_cache
 
 lg = logging.getLogger(__name__)
 
@@ -26,6 +28,9 @@ class MovieService:
 
     async def new_movie(self, data: NewMovie, image: MovieImage) -> UUID:
         lg.info("create movie with data", extra=data.model_dump())
+
+        if image.title.split(".")[-1] not in ["png", "jpeg", "jpg", "ico", "csv"]:
+            raise InvalidImageExtensionError()
 
         try:
             async with open(
@@ -82,3 +87,10 @@ class MovieService:
         except Exception:
             lg.exception("movie delete error", extra={"id": str(id)})
             raise
+
+    @movie_cache
+    async def get_movies(self):
+        lg.info('select all movies')
+        result = await self.movie_repository.get_movies()
+        lg.info('success movies select')
+        return result

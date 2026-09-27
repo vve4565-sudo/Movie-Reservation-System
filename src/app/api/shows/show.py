@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Annotated
 from uuid import UUID
 
@@ -59,13 +59,16 @@ async def delete_show(
     return result
 
 
-@router.get("/avalabile")
+@router.get("/available")
 async def get_all_shows(
     show_service: Annotated[ShowService, Depends(get_show_service)],
-    start: datetime = datetime.now(),
+    movie_id: UUID,
+    start: datetime = datetime.now(UTC),
     finish: datetime | None = None,
 ):
     lg.info("get all shows with params", extra={"start": start, "finish": finish})
-    result = await show_service.get_all_shows(start, finish)
+    result = await show_service.get_all_shows(
+        movie_id=movie_id, start=start, finish=finish
+    )
     lg.info("success show select")
     return result

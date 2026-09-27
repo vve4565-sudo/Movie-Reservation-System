@@ -58,3 +58,9 @@ class MovieRepository:
         await self.session.commit()
         lg.info("success movie delete", extra={"id": id})
         return
+
+    async def get_movies(self):
+        lg.info("select all movies")
+        query = select(Movie)
+        result = await self.session.execute(query)
+        return result.scalars().all()

@@ -47,11 +47,12 @@ class ShowRepository:
 
     async def get_all_shows(
         self,
+        movie_id: UUID,
         start: datetime,
         finish: datetime | None = None,
     ) -> list[Show]:
         lg.info("get all shows with params", extra={"start": start, "finish": finish})
-        query = select(Show).where(Show.start >= start)
+        query = select(Show).where(Show.movie_id == movie_id).where(Show.start <= start)
         if finish:
             query = query.where(Show.finish <= finish)
 

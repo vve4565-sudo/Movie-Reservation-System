@@ -1,9 +1,11 @@
 import json
 import logging
-from datetime import timedelta
+from datetime import datetime, timedelta
 from functools import wraps
-from typing import Literal
+from types import FunctionType
+from uuid import UUID
 
+from database.models import Movie, Show
 from redis.asyncio import Redis
 
 lg = logging.getLogger(__name__)
@@ -14,28 +16,46 @@ rate_limiter_redis = Redis(
 )
 
 
-cache_movie_redis = Redis(db=1, decode_responses=False, retry_on_timeout=True)
+cache_movie_redis = Redis(db=1, decode_responses=True, retry_on_timeout=True)
 
 
-def cache_decorator(*, module: Literal["shows", "reservations"]):
-    def decorator(func):
-        @wraps(func)
-        async def wrapper(*args, **kwargs):
+def show_cache(func: FunctionType):
+    @wraps(func)
+    async def wrapper(*args, **kwargs):
+        if coded := await cache_movie_redis.get(f"show:{kwargs['movie_id']}"):
+            lg.info("load show cache")
+            decoded: dict = json.loads(coded)
+            return [json.loads(x) for x in decoded.values()]
+            # return [json.loads(x) for x in coded]
 
-            if coded := await cache_movie_redis.get(module):
-                lg.info(f"load cache for {module}")
-                return [json.loads(coded)]
+        result: list[Show] = await func(*args, **kwargs)
+        await cache_movie_redis.set(
+            f"show:{kwargs['movie_id']}",
+            json.dumps({str(i): x.to_str() for i, x in enumerate(result)}),
+            ex=timedelta(minutes=60),
+        )
+        lg.info("set expired show cache")
+        return result
 
-            result = await func(*args, **kwargs)
-            lg.info(f"set expired cache for {module}")
-            await cache_movie_redis.setex(
-                module,
-                timedelta(minutes=60),
-                *(x.to_bytes() for x in result),
-            )
+    return wrapper
 
-            return result
 
-        return wrapper
+def movie_cache(func: FunctionType):
+    @wraps(func)
+    async def wrapper(*args, **kwargs):
 
-    return decorator
+        if coded := await cache_movie_redis.get("movies"):
+            decoded: dict = json.loads(coded)
+            lg.info("load movie cache")
+            return [json.loads(x) for x in decoded.values()]
+
+        result: list[Movie] = await func(*args, **kwargs)
+        await cache_movie_redis.set(
+            "movies",
+            json.dumps({str(i): x.to_str() for i, x in enumerate(result)}),
+            timedelta(minutes=60),
+        )
+        lg.info("set expired movie cache")
+        return result
+
+    return wrapper

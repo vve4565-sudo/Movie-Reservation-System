@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from uuid import UUID
 
-from config.redis import cache_decorator
+from config.redis import show_cache
 from database.models import Show
 from exceptions.show import ShowsNotExists
 from repository.show import ShowRepository
@@ -44,13 +44,14 @@ class ShowService:
         lg.info("success show delete", extra={"id": id})
         return result
 
-    @cache_decorator(module="shows")
+    @show_cache
     async def get_all_shows(
         self,
+        movie_id: UUID,
         start: datetime,
         finish: datetime | None = None,
-    ) -> Sequence[Show]:
+    ):
         lg.info("get all shows with params", extra={"start": start, "finish": finish})
-        result = await self.show_repository.get_all_shows(start, finish)
+        result = await self.show_repository.get_all_shows(movie_id, start, finish)
         lg.info("success show select")
         return result
