@@ -9,6 +9,7 @@ class SOutputMovie(BaseModel):
     description: str
     genre: str
     director: str
+    image: str
 
     model_config = ConfigDict(from_attributes=True)
 

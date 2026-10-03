@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from uuid import UUID
 
 from aiofiles import open
-from config.config import config
+from config.config import ROOT_DIR, config
 from config.redis import movie_cache
 from database.models import Movie
 from exceptions.movie import (
@@ -109,7 +109,8 @@ class MovieService:
 
     async def get_image(self, image_path: str):
         lg.info("get movie image", extra={"path": image_path})
-        if not os.path.exists(f"\\storage\\{image_path}"):
+        full_path = ROOT_DIR / "storage" / image_path
+        if not os.path.exists(full_path):
             raise MovieImageNotExists("movie image not exists")
 
-        return FileResponse(f"\\storage\\{image_path}")
+        return FileResponse(full_path)
