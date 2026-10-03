@@ -5,6 +5,7 @@ from config.security import decode_token
 from database.database import get_session
 from database.models import Roles, User
 from fastapi import Depends, HTTPException, Request, status
+from repository.hall import HallRepository
 from repository.movie import MovieRepository
 from repository.reservation import ReservationRepository
 from repository.show import ShowRepository
@@ -48,6 +49,10 @@ async def get_auth_service(
     return AuthService(user_repository)
 
 
+async def get_hall_repository(session: SessionDep):
+    return HallRepository(session)
+
+
 async def get_movie_repository(session: SessionDep):
     return MovieRepository(session)
 
@@ -65,8 +70,9 @@ async def get_show_repository(session: SessionDep):
 async def get_show_service(
     show_repository: Annotated[ShowRepository, Depends(get_show_repository)],
     movie_repository: Annotated[MovieRepository, Depends(get_movie_repository)],
+    hall_repository: Annotated[HallRepository, Depends(get_hall_repository)],
 ):
-    return ShowService(show_repository, movie_repository)
+    return ShowService(show_repository, movie_repository, hall_repository)
 
 
 async def get_reservation_repository(session: SessionDep):

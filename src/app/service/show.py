@@ -7,6 +7,7 @@ from uuid import UUID
 from config.redis import show_cache
 from database.models import Show
 from exceptions.show import ShowsNotExists
+from repository.hall import HallRepository
 from repository.movie import MovieRepository
 from repository.show import ShowRepository
 from schemas.show import SShowOutput
@@ -18,6 +19,7 @@ lg = logging.getLogger(__name__)
 class ShowService:
     show_repository: ShowRepository
     movie_repository: MovieRepository
+    hall_repository: HallRepository
 
     async def create_show(
         self,
@@ -65,4 +67,9 @@ class ShowService:
         ]
         lg.info("success show select")
         return serialized_result
- 
+
+    async def get_chairs_by_hall_id(self, hall_id: UUID):
+        lg.info("select hall by hall_id", extra={"hall_id": hall_id})
+        result = await self.hall_repository.get_chairs_by_hall_id(hall_id)
+        lg.info("success select hall by id", extra={"hall_id": hall_id})
+        return result

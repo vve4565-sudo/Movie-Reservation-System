@@ -7,6 +7,7 @@ from api.Depends import current_user_is_admin, get_show_service
 from database.models import User
 from exceptions.show import ShowsNotExists
 from fastapi import APIRouter, Depends, HTTPException, status
+from schemas.chair import SChairOutput
 from service.show import ShowService
 
 router = APIRouter(prefix="/shows", tags=["show"])
@@ -68,4 +69,15 @@ async def get_all_shows(
     lg.info("get all shows with params", extra={"start": start})
     result = await show_service.get_all_shows(movie_id=movie_id, start=start)
     lg.info("success show select")
+    return result
+
+
+@router.get("/hall/{hall_id}")
+async def get_chairs_by_hall_id(
+    hall_id: str,
+    show_service: Annotated[ShowService, Depends(get_show_service)],
+) -> SChairOutput:
+    lg.info("select hall by hall_id", extra={"hall_id": hall_id})
+    result = await show_service.get_chairs_by_hall_id(UUID(hall_id))
+    lg.info("success select hall by id", extra={"hall_id": hall_id})
     return result

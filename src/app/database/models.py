@@ -48,6 +48,8 @@ class User(IDMixin, Base):
 
     is_superuser: Mapped[bool] = mapped_column(default=False)
 
+    reservations: Mapped["Reservation"] = relationship(back_populates="user")
+
 
 class Movie(IDMixin, Base):
     __tablename__ = "movies"
@@ -58,17 +60,6 @@ class Movie(IDMixin, Base):
     genre: Mapped[str] = mapped_column()
     director: Mapped[str] = mapped_column()
     lenght: Mapped[int]
-
-    def to_str(self):
-        return json.dumps({
-            "id": str(self.id),
-            "title": self.title,
-            "description": self.description,
-            "image": self.image,
-            "genre": self.genre,
-            "director": self.director,
-            "lenght": self.lenght,
-        })
 
 
 class Hall(IDMixin, Base):
@@ -87,15 +78,7 @@ class Show(IDMixin, Base):
     hall_id: Mapped[UUID] = mapped_column(ForeignKey(Hall.id))
 
     hall: Mapped[Hall] = relationship(back_populates="shows")
-
-    def to_str(self):
-        return json.dumps({
-            "id": str(self.id),
-            "movie_id": str(self.movie_id),
-            "start": str(self.start),
-            "finish": str(self.finish),
-            "hall_id": str(self.hall_id),
-        })
+    reservations: Mapped["Reservation"] = relationship(back_populates="show")
 
 
 class Chair(IDMixin, Base):
@@ -103,6 +86,8 @@ class Chair(IDMixin, Base):
 
     hall_id: Mapped[UUID] = mapped_column(ForeignKey(Hall.id))
     chair_number: Mapped[int]
+
+    reservations: Mapped["Reservation"] = relationship(back_populates="chair")
 
 
 class Reservation(IDMixin, Base):
@@ -112,10 +97,6 @@ class Reservation(IDMixin, Base):
     user_id: Mapped[UUID] = mapped_column(ForeignKey(User.id))
     chair_id: Mapped[UUID] = mapped_column(ForeignKey(Chair.id))
 
-    def to_str(self):
-        return json.dumps({
-            "id": str(self.id),
-            "show_id": str(self.show_id),
-            "user_id": str(self.user_id),
-            "chair_id": str(self.chair_id),
-        })
+    show: Mapped[Show] = relationship(back_populates="reservations")
+    user: Mapped[User] = relationship(back_populates="reservations")
+    chair: Mapped[Chair] = relationship(back_populates="reservations")
