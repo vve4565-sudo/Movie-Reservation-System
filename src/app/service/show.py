@@ -1,13 +1,15 @@
 import logging
 from collections.abc import Sequence
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 from uuid import UUID
 
 from config.redis import show_cache
 from database.models import Show
 from exceptions.show import ShowsNotExists
+from repository.movie import MovieRepository
 from repository.show import ShowRepository
+from schemas.show import SShowOutput
 
 lg = logging.getLogger(__name__)
 
@@ -15,13 +17,16 @@ lg = logging.getLogger(__name__)
 @dataclass
 class ShowService:
     show_repository: ShowRepository
+    movie_repository: MovieRepository
 
     async def create_show(
         self,
         movie_id: UUID,
         start: datetime,
-        finish: datetime,
     ) -> UUID:
+        lg.info("select movie.lenght from database")
+        movie_lenght = (await self.movie_repository.get_movie_by_id(movie_id)).lenght
+        finish = start + timedelta(seconds=movie_lenght)
         lg.info(
             "create show with data",
             extra={"movie_id": movie_id, "start": start, "finish": finish},
@@ -49,9 +54,15 @@ class ShowService:
         self,
         movie_id: UUID,
         start: datetime,
-        finish: datetime | None = None,
     ):
-        lg.info("get all shows with params", extra={"start": start, "finish": finish})
-        result = await self.show_repository.get_all_shows(movie_id, start, finish)
+        lg.info("get all shows with params", extra={"start": start})
+        result = await self.show_repository.get_all_shows(
+            movie_id,
+            start,
+        )
+        serialized_result = [
+            SShowOutput.model_validate(x, from_attributes=True) for x in result
+        ]
         lg.info("success show select")
-        return result
+        return serialized_result
+ 

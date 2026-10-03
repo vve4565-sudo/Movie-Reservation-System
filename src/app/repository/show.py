@@ -1,12 +1,13 @@
 import logging
-from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import datetime
+from typing import Union
 from uuid import UUID
 
-from database.models import Movie, Show
+from database.models import Hall, Movie, Show
 from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import joinedload
 
 lg = logging.getLogger(__name__)
 
@@ -49,14 +50,14 @@ class ShowRepository:
         self,
         movie_id: UUID,
         start: datetime,
-        finish: datetime | None = None,
     ) -> list[Show]:
-        lg.info("get all shows with params", extra={"start": start, "finish": finish})
-        query = select(Show).where(Show.movie_id == movie_id).where(Show.start <= start)
-        if finish:
-            query = query.where(Show.finish <= finish)
-
-        query = query.join(Movie)
+        lg.info("get all shows with params", extra={"start": start})
+        query = (
+            select(Show, Hall.hall_number)
+            .where(Show.movie_id == movie_id, Show.start >= start)
+            .options(joinedload(Show.hall))
+            .order_by(Show.start.asc())
+        )
         result = await self.session.execute(query)
         lg.info("success show select")
-        return list(result.scalars().all())
+        return list(result.scalars().unique().all())

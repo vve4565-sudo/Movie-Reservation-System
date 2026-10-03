@@ -28,7 +28,7 @@ class MovieRepository:
 
     async def new_movie(self, data: NewMovie, image_title: str) -> UUID:
         lg.info("create movie with data", extra=data.model_dump())
-        movie = Movie(**data.model_dump(), image=config.BASE_STORAGE_URL + image_title)
+        movie = Movie(**data.model_dump(), image=image_title)
         self.session.add(movie)
         await self.session.commit()
         lg.info("success movie create", extra={"id": movie.id})
@@ -63,4 +63,5 @@ class MovieRepository:
         lg.info("select all movies")
         query = select(Movie)
         result = await self.session.execute(query)
+        lg.info("success select movies")
         return result.scalars().all()

@@ -1,15 +1,26 @@
 import logging
+import os
 from dataclasses import dataclass
 from uuid import UUID
 
 from aiofiles import open
 from config.config import config
-from database.models import Movie
-from exceptions.movie import ImageSaveError, InvalidImageExtensionError
-from repository.movie import MovieRepository
-from schemas.movie import MovieImage, MovieImagePatch, MoviePatch, NewMovie
-
 from config.redis import movie_cache
+from database.models import Movie
+from exceptions.movie import (
+    ImageSaveError,
+    InvalidImageExtensionError,
+    MovieImageNotExists,
+)
+from fastapi.responses import FileResponse
+from repository.movie import MovieRepository
+from schemas.movie import (
+    MovieImage,
+    MovieImagePatch,
+    MoviePatch,
+    NewMovie,
+    SOutputMovie,
+)
 
 lg = logging.getLogger(__name__)
 
@@ -90,7 +101,15 @@ class MovieService:
 
     @movie_cache
     async def get_movies(self):
-        lg.info('select all movies')
+        lg.info("select all movies")
         result = await self.movie_repository.get_movies()
-        lg.info('success movies select')
-        return result
+        serialized_result = [SOutputMovie.model_validate(x) for x in result]
+        lg.info("success movies select")
+        return serialized_result
+
+    async def get_image(self, image_path: str):
+        lg.info("get movie image", extra={"path": image_path})
+        if not os.path.exists(f"\\storage\\{image_path}"):
+            raise MovieImageNotExists("movie image not exists")
+
+        return FileResponse(f"\\storage\\{image_path}")

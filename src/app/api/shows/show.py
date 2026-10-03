@@ -18,15 +18,15 @@ async def new_show(
     admin: Annotated[User, Depends(current_user_is_admin)],
     movie_id: str,
     start: datetime,
-    finish: datetime,
+    # finish: datetime,
     show_service: Annotated[ShowService, Depends(get_show_service)],
 ):
     lg.info(
         "create show with data",
-        extra={"movie_id": movie_id, "start": start, "finish": finish},
+        extra={"movie_id": movie_id, "start": start},
     )
 
-    id = await show_service.create_show(UUID(movie_id), start, finish)
+    id = await show_service.create_show(UUID(movie_id), start)
     lg.info("success show create", extra={"id": id})
     return id
 
@@ -64,11 +64,8 @@ async def get_all_shows(
     show_service: Annotated[ShowService, Depends(get_show_service)],
     movie_id: UUID,
     start: datetime = datetime.now(UTC),
-    finish: datetime | None = None,
 ):
-    lg.info("get all shows with params", extra={"start": start, "finish": finish})
-    result = await show_service.get_all_shows(
-        movie_id=movie_id, start=start, finish=finish
-    )
+    lg.info("get all shows with params", extra={"start": start})
+    result = await show_service.get_all_shows(movie_id=movie_id, start=start)
     lg.info("success show select")
     return result

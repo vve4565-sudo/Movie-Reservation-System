@@ -28,9 +28,9 @@ class RateLimiter(BaseHTTPMiddleware):
         # user_ip = request.headers["X-Real-IP"]
         user_ip = str(request.client.host)
         if not await self.redis.get(user_ip):
-            await self.redis.setex(name=user_ip, time=timedelta(minutes=15), value=1)
+            await self.redis.setex(name=user_ip, time=timedelta(minutes=1), value=1)
 
-        elif int(await self.redis.get(user_ip)) < 30:
+        elif int(await self.redis.get(user_ip)) < 60:
             await self.redis.incrby(name=user_ip)
 
         else:

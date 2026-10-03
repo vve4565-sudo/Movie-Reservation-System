@@ -4,9 +4,14 @@ from uuid import UUID
 
 from api.Depends import current_user_is_admin, get_movie_service
 from database.models import User
-from exceptions.movie import ImageSaveError, InvalidImageExtensionError
+from exceptions.movie import (
+    ImageSaveError,
+    InvalidImageExtensionError,
+    MovieImageNotExists,
+)
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
-from schemas.movie import MovieImage, MovieImagePatch, MoviePatch, NewMovie, OutputMovie
+from fastapi.responses import FileResponse
+from schemas.movie import MovieImage, MovieImagePatch, MoviePatch, NewMovie, SOutputMovie
 from service.movie import MovieService
 
 router = APIRouter(prefix="/movies", tags=["movie"])
@@ -17,7 +22,7 @@ lg = logging.getLogger(__name__)
 async def get_movie_by_id(
     movie_service: Annotated[MovieService, Depends(get_movie_service)],
     id: str,
-) -> OutputMovie:
+) -> SOutputMovie:
 
     lg.info("get movie by id", extra={"id": id})
     result = await movie_service.get_movie(UUID(id))
@@ -106,3 +111,17 @@ async def get_movies(
     result = await movie_service.get_movies()
     lg.info("success select movies")
     return result
+
+
+@router.get("/images/{image_path}")
+async def get_image(
+    image_path: str, movie_service: Annotated[MovieService, Depends(get_movie_service)]
+):
+    lg.info("get movie image", extra={"path": image_path})
+    try:
+        result = await movie_service.get_image(image_path)
+        lg.info("success get movie image")
+        return result
+    except MovieImageNotExists as e:
+        lg.error(e)
+        raise HTTPException(status.HTTP_404_NOT_FOUND)

@@ -6,3 +6,8 @@ class ImageSaveError(Exception):
 class InvalidImageExtensionError(Exception):
     def __init__(self, *args: object) -> None:
         super().__init__(*args)
+
+
+class MovieImageNotExists(Exception):
+    def __init__(self, *args: object) -> None:
+        super().__init__(*args)

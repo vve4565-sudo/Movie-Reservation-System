@@ -3,7 +3,7 @@ from uuid import UUID
 from pydantic import BaseModel, ConfigDict
 
 
-class OutputMovie(BaseModel):
+class SOutputMovie(BaseModel):
     id: UUID
     title: str
     description: str

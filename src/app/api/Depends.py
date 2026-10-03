@@ -64,8 +64,9 @@ async def get_show_repository(session: SessionDep):
 
 async def get_show_service(
     show_repository: Annotated[ShowRepository, Depends(get_show_repository)],
+    movie_repository: Annotated[MovieRepository, Depends(get_movie_repository)],
 ):
-    return ShowService(show_repository)
+    return ShowService(show_repository, movie_repository)
 
 
 async def get_reservation_repository(session: SessionDep):
@@ -78,5 +79,3 @@ async def get_reservation_service(
     ],
 ):
     return ReservationService(reservation_repository)
-
-

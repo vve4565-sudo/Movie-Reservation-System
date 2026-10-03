@@ -9,6 +9,7 @@ from sqlalchemy.orm import (
     Mapped,
     declarative_mixin,
     mapped_column,
+    relationship,
     relationships,
 )
 
@@ -56,6 +57,7 @@ class Movie(IDMixin, Base):
     image: Mapped[str] = mapped_column()
     genre: Mapped[str] = mapped_column()
     director: Mapped[str] = mapped_column()
+    lenght: Mapped[int]
 
     def to_str(self):
         return json.dumps({
@@ -65,7 +67,15 @@ class Movie(IDMixin, Base):
             "image": self.image,
             "genre": self.genre,
             "director": self.director,
+            "lenght": self.lenght,
         })
+
+
+class Hall(IDMixin, Base):
+    __tablename__ = "halls"
+
+    hall_number: Mapped[int]
+    shows: Mapped["Show"] = relationship(back_populates="hall")
 
 
 class Show(IDMixin, Base):
@@ -74,6 +84,9 @@ class Show(IDMixin, Base):
     movie_id: Mapped[UUID] = mapped_column(ForeignKey(Movie.id))
     start: Mapped[datetime] = mapped_column(DateTime(True))
     finish: Mapped[datetime] = mapped_column(DateTime(True))
+    hall_id: Mapped[UUID] = mapped_column(ForeignKey(Hall.id))
+
+    hall: Mapped[Hall] = relationship(back_populates="shows")
 
     def to_str(self):
         return json.dumps({
@@ -81,13 +94,8 @@ class Show(IDMixin, Base):
             "movie_id": str(self.movie_id),
             "start": str(self.start),
             "finish": str(self.finish),
+            "hall_id": str(self.hall_id),
         })
-
-
-class Hall(IDMixin, Base):
-    __tablename__ = "halls"
-
-    hall_number: Mapped[int]
 
 
 class Chair(IDMixin, Base):
