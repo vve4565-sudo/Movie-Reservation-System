@@ -26,3 +26,14 @@ dependencies = [
     "aioredis>=2.0.1",
     "redis>=8.1.0",
 ]
+
+[dependency-groups]
+test = [
+    "aiosqlite>=0.21.0",
+    "httpx2>=1.0.0",
+    "pytest>=8.4.0",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["src/app"]
+testpaths = ["src/test"]
