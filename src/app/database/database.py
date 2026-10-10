@@ -32,7 +32,7 @@ async def init_db():
                 password_hash=await hash_password(
                     config.SUPERUSER_PASSWORD,
                 ),
-                Role=Roles.admin,
+                role=Roles.admin,
                 is_active=True,
                 is_superuser=True,
             )

@@ -118,7 +118,7 @@ async def get_reservation_by_user_id(
     result = await reservation_service.get_reservation_by_user_id(user_id)
     lg.info("success select reservation by id")
 
-    if user.Role == Roles.admin:
+    if user.role == Roles.admin:
         return SReservationOutputAdmin_adapter.validate_python(result)
 
     return SReservationOutput_adapter.validate_python(result)

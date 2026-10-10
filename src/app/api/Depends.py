@@ -49,7 +49,7 @@ async def current_user(session: SessionDep, request: Request):
 
 
 async def current_user_is_admin(user: Annotated[User, Depends(current_user)]):
-    if user.Role == Roles.admin:
+    if user.role == Roles.admin:
         return user
 
     raise HTTPException(status.HTTP_403_FORBIDDEN)

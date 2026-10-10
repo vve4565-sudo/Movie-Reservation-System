@@ -30,7 +30,7 @@ class ShowService:
         movie = await self.movie_repository.get_movie_by_id(movie_id)
         if not movie:
             raise MovieNotExists()
-        finish = start + timedelta(minutes=movie.length)
+        finish = start + timedelta(seconds=movie.length)
         lg.info(
             "create show with data",
             extra={
