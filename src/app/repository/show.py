@@ -19,14 +19,20 @@ class ShowRepository:
     async def create_show(
         self,
         movie_id: UUID,
+        hall_id: UUID,
         start: datetime,
         finish: datetime,
     ) -> UUID:
         lg.info(
             "create show with data",
-            extra={"movie_id": movie_id, "start": start, "finish": finish},
+            extra={
+                "movie_id": movie_id,
+                "hall_id": hall_id,
+                "start": start,
+                "finish": finish,
+            },
         )
-        show = Show(movie_id=movie_id, start=start, finish=finish)
+        show = Show(movie_id=movie_id, hall_id=hall_id, start=start, finish=finish)
         self.session.add(show)
         await self.session.commit()
         lg.info("success show create", extra={"id": show.id})
@@ -43,8 +49,8 @@ class ShowRepository:
         lg.info("delete show with id", extra={"id": id})
         query = delete(Show).where(Show.id == id)
         await self.session.execute(query)
+        await self.session.commit()
         lg.info("success show delete", extra={"id": id})
-        return
 
     async def get_all_shows(
         self,
@@ -53,7 +59,7 @@ class ShowRepository:
     ) -> list[Show]:
         lg.info("get all shows with params", extra={"start": start})
         query = (
-            select(Show, Hall.hall_number)
+            select(Show)
             .where(Show.movie_id == movie_id, Show.start >= start)
             .options(joinedload(Show.hall))
             .order_by(Show.start.asc())

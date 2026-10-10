@@ -1,5 +1,5 @@
 import asyncio
-from datetime import datetime, timezone
+from datetime import UTC, datetime, timezone
 from uuid import UUID
 
 import jwt
@@ -25,20 +25,28 @@ async def get_access_token(id: UUID):
         data,
         config.JWT_SECRET_KEY,
         config.CRYPT_ALGORITHM,
+        headers={"refresh": False, "access": True},
     )
     return access_token
 
 
 async def get_refresh_token(id: UUID):
-    expire = datetime.now(timezone.utc) + config.REFRESH_TOKEN_EXPIRE
+    expire = datetime.now(UTC) + config.REFRESH_TOKEN_EXPIRE
     data = {"sub": str(id), "exp": expire}
     refresh_token = jwt.encode(
         data,
         config.JWT_SECRET_KEY,
         config.CRYPT_ALGORITHM,
+        headers={"refresh": True, "access": False},
     )
     return refresh_token
 
 
 async def decode_token(token: str):
-    return jwt.decode(token, config.JWT_SECRET_KEY, config.CRYPT_ALGORITHM)
+    payload = jwt.decode_complete(
+        token,
+        config.JWT_SECRET_KEY,
+        config.CRYPT_ALGORITHM,
+        verify=True,
+    )
+    return payload

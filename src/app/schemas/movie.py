@@ -1,9 +1,9 @@
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict
+from .base import Base
 
 
-class SOutputMovie(BaseModel):
+class SOutputMovie(Base):
     id: UUID
     title: str
     description: str
@@ -11,28 +11,31 @@ class SOutputMovie(BaseModel):
     director: str
     image: str
 
-    model_config = ConfigDict(from_attributes=True)
 
-
-class NewMovie(BaseModel):
+class NewMovie(Base):
     title: str
     description: str
     genre: str
     director: str
+    length: int
 
 
-class MovieImage(BaseModel):
+class MovieImage(Base):
     image: bytes
     title: str
 
 
-class MoviePatch(BaseModel):
+class MoviePatch(Base):
     title: str | None = None
     description: str | None = None
     genre: str | None = None
     director: str | None = None
 
 
-class MovieImagePatch(BaseModel):
+class MovieImagePatch(Base):
     image: bytes | None = None
     title: str | None = None
+
+
+class SMovieFReservation(Base):
+    title: str

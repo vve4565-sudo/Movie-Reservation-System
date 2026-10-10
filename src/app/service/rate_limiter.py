@@ -30,7 +30,7 @@ class RateLimiter(BaseHTTPMiddleware):
         if not await self.redis.get(user_ip):
             await self.redis.setex(name=user_ip, time=timedelta(minutes=1), value=1)
 
-        elif int(await self.redis.get(user_ip)) < 60:
+        elif int(await self.redis.get(user_ip)) < 120:
             await self.redis.incrby(name=user_ip)
 
         else:

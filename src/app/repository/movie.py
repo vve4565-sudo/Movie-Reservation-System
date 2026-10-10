@@ -15,14 +15,14 @@ lg = logging.getLogger(__name__)
 class MovieRepository:
     session: AsyncSession
 
-    async def get_movie_by_id(self, id: UUID) -> Movie:
+    async def get_movie_by_id(self, id: UUID) -> Movie | None:
 
         lg.info("get movie by id", extra={"id": str(id)})
 
         query = select(Movie).where(Movie.id == id)
 
         result = await self.session.execute(query)
-        res = result.scalar_one()
+        res = result.scalar_one_or_none()
         lg.info("success movie select")
         return res
 
@@ -38,23 +38,25 @@ class MovieRepository:
         self,
         id: UUID,
         data: MoviePatch,
-        image_title: str,
     ) -> UUID:
         lg.info(
             "patch movie with data", extra={"id": str(id), "data": data.model_dump()}
         )
 
-        update(Movie).where(Movie.id == id).values(
-            data.model_dump(exclude_none=True), image=image_title
+        statement = (
+            update(Movie)
+            .where(Movie.id == id)
+            .values(data.model_dump(exclude_none=True))
         )
-
+        await self.session.execute(statement)
         await self.session.commit()
         lg.info("success movie patch", extra={"id": id})
         return id
 
     async def delete_movie(self, id: UUID) -> None:
         lg.info("delete movie with id", extra={"id": id})
-        delete(Movie).where(Movie.id == id)
+        statement = delete(Movie).where(Movie.id == id)
+        await self.session.execute(statement)
         await self.session.commit()
         lg.info("success movie delete", extra={"id": id})
         return

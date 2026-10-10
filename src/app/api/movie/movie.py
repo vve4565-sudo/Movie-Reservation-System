@@ -11,7 +11,13 @@ from exceptions.movie import (
 )
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
 from fastapi.responses import FileResponse
-from schemas.movie import MovieImage, MovieImagePatch, MoviePatch, NewMovie, SOutputMovie
+from schemas.movie import (
+    MovieImage,
+    MovieImagePatch,
+    MoviePatch,
+    NewMovie,
+    SOutputMovie,
+)
 from service.movie import MovieService
 
 router = APIRouter(prefix="/movies", tags=["movie"])
@@ -32,14 +38,19 @@ async def get_movie_by_id(
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
 async def new_movie(
-    image: Annotated[UploadFile, File()],
+    image: UploadFile,
     title: Annotated[str, Form()],
     description: Annotated[str, Form()],
     genre: Annotated[str, Form()],
     director: Annotated[str, Form()],
     admin: Annotated[User, Depends(current_user_is_admin)],
     movie_service: Annotated[MovieService, Depends(get_movie_service)],
+    length: Annotated[int, Form()],
 ):
+    if image.size > 200:  # type: ignore
+        raise HTTPException(
+            status.HTTP_400_BAD_REQUEST, detail="image size must be less than 200 mb"
+        )
     lg.info("serialize file as MovieImage object")
     movie_image = MovieImage(image=await image.read(), title=image.filename)  # type: ignore
     data = NewMovie(
@@ -47,6 +58,7 @@ async def new_movie(
         description=description,
         genre=genre,
         director=director,
+        length=length,
     )
     lg.info("create movie with data", extra=data.model_dump())
     try:
@@ -75,17 +87,18 @@ async def patch_movie_data(
     if not image:
         movie_image = MovieImagePatch()
 
+    else:
+        lg.info("serialize file as image")
+        movie_image = MovieImagePatch(image=await image.read(), title=image.filename)  # type: ignore
+
     if not data:
         data = MoviePatch()
 
-    lg.info("serialize file as image")
-    movie_image = MovieImagePatch(image=await image.read(), title=image.filename)  # type: ignore
-
     lg.info("create movie with data", extra=data.model_dump())
     try:
-        id = await movie_service.patch_movie_data(UUID(id), data, movie_image)  # type: ignore
+        await movie_service.patch_movie_data(UUID(id), data, movie_image)
     except ImageSaveError:
-        lg.exception("movie image save error", extra={"title": movie_image.title})
+        lg.exception("movie image save error", extra={"id": id})
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
     lg.info("success movie create", extra={"id": id})
     return id

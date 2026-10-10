@@ -45,9 +45,9 @@ class Config(BaseSettings):
     REFRESH_TOKEN_EXPIRE: timedelta = timedelta(days=30)
     CRYPT_ALGORITHM: str = "HS256"
 
-    BASE_STORAGE_URL: str = str(ROOT_DIR) + r"/storage"
+    BASE_STORAGE_URL: Path = ROOT_DIR / "storage"
 
-    REDIS_PASSWORD: str
+    REDIS_PORT: int
 
 
 class LOGGER_LEVEL(StrEnum):

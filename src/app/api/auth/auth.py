@@ -6,6 +6,7 @@ from api.Depends import get_auth_service
 from config.security import decode_token, get_access_token, get_refresh_token
 from exceptions.auth import UserAlreadyExists, UserNotExists, WrongPassword
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
+from jwt import ExpiredSignatureError
 from schemas.auth import AuthCreds, FullCredentials, OutputUser
 from service.auth import AuthService
 
@@ -38,9 +39,9 @@ async def registration(
     response.set_cookie(
         "refresh_token",
         refresh_token,
-        max_age=30,
         secure=True,
         httponly=True,
+        samesite="none",
     )
 
     lg.info("Registration succeeded for user_id=%s", user.id)
@@ -83,9 +84,9 @@ async def login(
     response.set_cookie(
         "refresh_token",
         refresh_token,
-        max_age=30,
         secure=True,
         httponly=True,
+        samesite="none",
     )
 
     lg.info("Login succeeded for user_id=%s", user.id)
@@ -98,7 +99,7 @@ async def logout(response: Response):
 
     lg.info("Logout request received")
 
-    response.headers["Authorization"] = ""
+    response.headers["Authorization"] = "Bearer "
     response.delete_cookie("refresh_token")
     return
 
@@ -113,17 +114,24 @@ async def refresh_access_token(request: Request, response: Response):
         lg.warning("Token refresh failed: refresh token missing")
 
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "refresh token expired")
-    decoded_token = await decode_token(old_refresh_token)
-    uuid = UUID(decoded_token.get("sub"))
+    try:
+        decoded_token = await decode_token(old_refresh_token)
+    except ExpiredSignatureError:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="Token expired")
+    except:
+        raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, detail="server error")
+    if not decoded_token.get("header").get("refresh"):
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "invalid refresh token")
+    uuid = UUID(decoded_token.get("payload").get("sub"))
     new_access_token = await get_access_token(uuid)
     new_refresh_token = await get_refresh_token(uuid)
     response.headers["Authorization"] = f"Bearer {new_access_token}"
     response.set_cookie(
         "refresh_token",
         new_refresh_token,
-        30,
         secure=True,
         httponly=True,
+        samesite="none",
     )
 
     lg.info("Token refresh succeeded for user_id=%s", uuid, extra={"id": uuid})

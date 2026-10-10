@@ -1,10 +1,12 @@
-from typing import Literal
+from uuid import UUID
 
 from database.models import Roles
-from pydantic import BaseModel, ConfigDict, EmailStr
+from pydantic import EmailStr
+
+from .base import Base
 
 
-class Credentials(BaseModel):
+class Credentials(Base):
     email: EmailStr
     nickname: str
 
@@ -17,15 +19,14 @@ class HashedCredentials(Credentials):
     password_hash: str
 
 
-class OutputUser(BaseModel):
+class OutputUser(Base):
+    id: UUID
     nickname: str
     email: EmailStr
-    Role: Roles
-
-    model_config = ConfigDict(from_attributes=True)
+    role: Roles
 
 
-class AuthCreds(BaseModel):
+class AuthCreds(Base):
     password: str
     email: EmailStr
 

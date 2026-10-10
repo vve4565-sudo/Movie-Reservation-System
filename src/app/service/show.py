@@ -1,11 +1,10 @@
 import logging
-from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from uuid import UUID
 
-from config.redis import show_cache
-from database.models import Show
+from config.redis import invalidate_show_cache, show_cache
+from exceptions.movie import MovieNotExists
 from exceptions.show import ShowsNotExists
 from repository.hall import HallRepository
 from repository.movie import MovieRepository
@@ -24,16 +23,25 @@ class ShowService:
     async def create_show(
         self,
         movie_id: UUID,
+        hall_id: UUID,
         start: datetime,
     ) -> UUID:
         lg.info("select movie.lenght from database")
-        movie_lenght = (await self.movie_repository.get_movie_by_id(movie_id)).lenght
-        finish = start + timedelta(seconds=movie_lenght)
+        movie = await self.movie_repository.get_movie_by_id(movie_id)
+        if not movie:
+            raise MovieNotExists()
+        finish = start + timedelta(minutes=movie.length)
         lg.info(
             "create show with data",
-            extra={"movie_id": movie_id, "start": start, "finish": finish},
+            extra={
+                "movie_id": movie_id,
+                "hall_id": hall_id,
+                "start": start,
+                "finish": finish,
+            },
         )
-        id = await self.show_repository.create_show(movie_id, start, finish)
+        id = await self.show_repository.create_show(movie_id, hall_id, start, finish)
+        await invalidate_show_cache(movie_id)
         lg.info("success show create", extra={"id": id})
         return id
 
@@ -45,11 +53,13 @@ class ShowService:
         lg.info("success show select")
         return show
 
-    async def delete_show(self, id: UUID):
+    async def delete_show(self, id: UUID) -> None:
         lg.info("delete show with id", extra={"id": id})
-        result = await self.show_repository.delete_show(id)
+        show = await self.show_repository.get_show(id)
+        await self.show_repository.delete_show(id)
+        if show:
+            await invalidate_show_cache(show.movie_id)
         lg.info("success show delete", extra={"id": id})
-        return result
 
     @show_cache
     async def get_all_shows(

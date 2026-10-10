@@ -24,7 +24,7 @@ class AuthService:
         )
 
         try:
-            lg.info("create user with data", extra=new_credentials.model_dump())
+            lg.info("create user with data", extra=new_credentials.model_dump(exclude={'password_hash'}))
             user = await self.UserRepository.create_new_user(new_credentials)
             lg.info("success user create", extra={"id": user.id})
             return user
@@ -33,7 +33,9 @@ class AuthService:
             raise UserAlreadyExists("User already exists")
 
     async def authenticate_user(self, credentials: AuthCreds) -> User:
-        lg.info("select user with data", extra=credentials.model_dump())
+        lg.info(
+            "select user with data", extra=credentials.model_dump(exclude={"password"})
+        )
         user = await self.UserRepository.select_user(credentials)
 
         if not user:

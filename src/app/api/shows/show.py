@@ -5,6 +5,7 @@ from uuid import UUID
 
 from api.Depends import current_user_is_admin, get_show_service
 from database.models import User
+from exceptions.movie import MovieNotExists
 from exceptions.show import ShowsNotExists
 from fastapi import APIRouter, Depends, HTTPException, status
 from schemas.chair import SChairOutput
@@ -18,16 +19,18 @@ lg = logging.getLogger(__name__)
 async def new_show(
     admin: Annotated[User, Depends(current_user_is_admin)],
     movie_id: str,
+    hall_id: str,
     start: datetime,
-    # finish: datetime,
     show_service: Annotated[ShowService, Depends(get_show_service)],
 ):
     lg.info(
         "create show with data",
-        extra={"movie_id": movie_id, "start": start},
+        extra={"movie_id": movie_id, "hall_id": hall_id, "start": start},
     )
-
-    id = await show_service.create_show(UUID(movie_id), start)
+    try:
+        id = await show_service.create_show(UUID(movie_id), UUID(hall_id), start)
+    except MovieNotExists:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="movie not exist")
     lg.info("success show create", extra={"id": id})
     return id
 
@@ -60,23 +63,25 @@ async def delete_show(
     return result
 
 
-@router.get("/available")
+@router.get("/available/")
 async def get_all_shows(
     show_service: Annotated[ShowService, Depends(get_show_service)],
     movie_id: UUID,
-    start: datetime = datetime.now(UTC),
+    start: datetime | None,
 ):
+    if not start:
+        start = datetime.now(UTC)
     lg.info("get all shows with params", extra={"start": start})
     result = await show_service.get_all_shows(movie_id=movie_id, start=start)
     lg.info("success show select")
     return result
 
 
-@router.get("/hall/{hall_id}")
+@router.get("/hall/{hall_id}/")
 async def get_chairs_by_hall_id(
     hall_id: str,
     show_service: Annotated[ShowService, Depends(get_show_service)],
-) -> SChairOutput:
+) -> list[SChairOutput]:
     lg.info("select hall by hall_id", extra={"hall_id": hall_id})
     result = await show_service.get_chairs_by_hall_id(UUID(hall_id))
     lg.info("success select hall by id", extra={"hall_id": hall_id})
