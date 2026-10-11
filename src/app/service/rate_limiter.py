@@ -25,7 +25,7 @@ class RateLimiter(BaseHTTPMiddleware):
         call_next: Callable[[Request[State]], Awaitable[Response]],
     ) -> Response:
 
-        user_ip = request.headers["X-Real-IP"]
+        user_ip = request.headers["X-Forwarded-For"]
         # user_ip = str(request.client.host)++
         if not await self.redis.get(user_ip):
             await self.redis.setex(name=user_ip, time=timedelta(minutes=1), value=1)
