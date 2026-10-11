@@ -18,13 +18,21 @@ dependencies = [
     "ruff>=0.16.6",
     "sqlalchemy>=2.0.52",
     "uvicorn>=0.52.4",
-    "jwt>=1.4.0",
-    "pyjwt>=2.14.0",
     "python-multipart>=0.0.32",
     "aiofiles>=25.1.0",
     "python-json-logger>=4.2.0",
     "aioredis>=2.0.1",
     "redis>=8.1.0",
+    "pyjwt>=2.15.1",
+    "aiosqlite==0.22.1",
+    "colorama>=0.4.6",
+    "cryptography>=50.0.2",
+    "httpcore2>=2.13.1",
+    "httpx2>=2.13.1",
+    "iniconfig>=2.3.1",
+    "pluggy>=1.6.0",
+    "pytest>=9.1.1",
+    "truststore>=0.10.4",
 ]
 
 [dependency-groups]

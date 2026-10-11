@@ -1,7 +1,30 @@
 services:
+  app:
+    image: moviereservationsystem:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: no
+    container_name: app
+    env_file:
+      - .env
+    volumes: 
+      - app_data:/data
+    depends_on:
+      - database
+      - redis
+
+  frontend:
+    build:
+      context: frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    restart: no
+
   database:
     image: postgres:15-alpine
     restart: no
+    container_name: database
     env_file:
       - .env
     ports:
@@ -12,11 +35,31 @@ services:
   redis:
     image: redis:7.4-alpine
     restart: no
+    container_name: redis
     ports:
       - "6379:6379"
     volumes: 
       - redis_data:/data
-    
+
+  nginx:
+    image: 'jc21/nginx-proxy-manager:2.16.0'
+    restart: no
+    container_name: nginx
+
+    ports:
+      - '80:80' # Public HTTP Port
+      - '443:443' # Public HTTPS Port
+      - '81:81' # Admin Web Port
+
+    environment:
+      TZ: "Australia/Brisbane"
+
+    volumes:
+      - ./data:/data
+      - ./letsencrypt:/etc/letsencrypt
+
+
 volumes:
   pgdata:
   redis_data:
+  app_data:
