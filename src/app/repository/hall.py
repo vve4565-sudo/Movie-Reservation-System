@@ -2,9 +2,10 @@ import logging
 from dataclasses import dataclass
 from uuid import UUID
 
-from database.models import Chair, Hall
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.database.models import Chair, Hall
 
 lg = logging.getLogger(__name__)
 

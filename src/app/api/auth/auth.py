@@ -2,13 +2,14 @@ import logging
 from typing import Annotated
 from uuid import UUID
 
-from api.Depends import get_auth_service
-from config.security import decode_token, get_access_token, get_refresh_token
-from exceptions.auth import UserAlreadyExists, UserNotExists, WrongPassword
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from jwt import ExpiredSignatureError
-from schemas.auth import AuthCreds, FullCredentials, OutputUser
-from service.auth import AuthService
+
+from app.api.Depends import get_auth_service
+from app.config.security import decode_token, get_access_token, get_refresh_token
+from app.exceptions.auth import UserAlreadyExists, UserNotExists, WrongPassword
+from app.schemas.auth import AuthCreds, FullCredentials, OutputUser
+from app.service.auth import AuthService
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 lg = logging.getLogger(__name__)

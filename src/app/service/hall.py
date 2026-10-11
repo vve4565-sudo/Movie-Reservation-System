@@ -1,7 +1,7 @@
 import logging
 from dataclasses import dataclass
 
-from repository.hall import HallRepository
+from app.repository.hall import HallRepository
 
 lg = logging.getLogger(__name__)
 

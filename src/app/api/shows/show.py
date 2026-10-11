@@ -3,13 +3,14 @@ from datetime import UTC, datetime
 from typing import Annotated
 from uuid import UUID
 
-from api.Depends import current_user_is_admin, get_show_service
-from database.models import User
-from exceptions.movie import MovieNotExists
-from exceptions.show import ShowsNotExists
 from fastapi import APIRouter, Depends, HTTPException, status
-from schemas.chair import SChairOutput
-from service.show import ShowService
+
+from app.api.Depends import current_user_is_admin, get_show_service
+from app.database.models import User
+from app.exceptions.movie import MovieNotExists
+from app.exceptions.show import ShowsNotExists
+from app.schemas.chair import SChairOutput
+from app.service.show import ShowService
 
 router = APIRouter(prefix="/shows", tags=["show"])
 lg = logging.getLogger(__name__)

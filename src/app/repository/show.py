@@ -1,13 +1,13 @@
 import logging
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Union
 from uuid import UUID
 
-from database.models import Hall, Movie, Show
 from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
+
+from app.database.models import Show
 
 lg = logging.getLogger(__name__)
 

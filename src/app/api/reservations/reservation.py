@@ -2,18 +2,19 @@ import logging
 from typing import Annotated
 from uuid import UUID
 
-from api.Depends import current_user, current_user_is_admin, get_reservation_service
-from database.models import Roles, User
-from exceptions.reservation import ReservationAlredyExist
 from fastapi import APIRouter, Depends, HTTPException, status
-from schemas.reservation import (
+
+from app.api.Depends import current_user, current_user_is_admin, get_reservation_service
+from app.database.models import Roles, User
+from app.exceptions.reservation import ReservationAlredyExist
+from app.schemas.reservation import (
     SNewReservation,
     SReservationOutput,
     SReservationOutput_adapter,
     SReservationOutputAdmin,
     SReservationOutputAdmin_adapter,
 )
-from service.reservation import ReservationService
+from app.service.reservation import ReservationService
 
 router = APIRouter(prefix="/reservation", tags=["reservation"])
 lg = logging.getLogger(__name__)

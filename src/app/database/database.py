@@ -1,10 +1,9 @@
-from collections.abc import AsyncGenerator
-
-from config.config import config
-from config.security import hash_password
-from database.models import Roles, User
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
+
+from app.config.config import config
+from app.config.security import hash_password
+from app.database.models import Roles, User
 
 engine = create_async_engine(str(config.database_config), echo=False)
 async_session_factory = async_sessionmaker(

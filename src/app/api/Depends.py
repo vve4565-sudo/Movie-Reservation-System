@@ -1,22 +1,23 @@
 from typing import Annotated
 from uuid import UUID
 
-from config.security import decode_token
-from database.database import get_session
-from database.models import Roles, User
 from fastapi import Depends, HTTPException, Request, status
 from jwt import ExpiredSignatureError
-from repository.hall import HallRepository
-from repository.movie import MovieRepository
-from repository.reservation import ReservationRepository
-from repository.show import ShowRepository
-from repository.user import UserRepository
-from service.auth import AuthService
-from service.hall import HallService
-from service.movie import MovieService
-from service.reservation import ReservationService
-from service.show import ShowService
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.config.security import decode_token
+from app.database.database import get_session
+from app.database.models import Roles, User
+from app.repository.hall import HallRepository
+from app.repository.movie import MovieRepository
+from app.repository.reservation import ReservationRepository
+from app.repository.show import ShowRepository
+from app.repository.user import UserRepository
+from app.service.auth import AuthService
+from app.service.hall import HallService
+from app.service.movie import MovieService
+from app.service.reservation import ReservationService
+from app.service.show import ShowService
 
 SessionDep = Annotated[AsyncSession, Depends(get_session)]
 

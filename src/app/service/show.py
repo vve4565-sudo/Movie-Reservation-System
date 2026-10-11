@@ -3,13 +3,13 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 from uuid import UUID
 
-from config.redis import invalidate_show_cache, show_cache
-from exceptions.movie import MovieNotExists
-from exceptions.show import ShowsNotExists
-from repository.hall import HallRepository
-from repository.movie import MovieRepository
-from repository.show import ShowRepository
-from schemas.show import SShowOutput
+from app.config.redis import invalidate_show_cache, show_cache
+from app.exceptions.movie import MovieNotExists
+from app.exceptions.show import ShowsNotExists
+from app.repository.hall import HallRepository
+from app.repository.movie import MovieRepository
+from app.repository.show import ShowRepository
+from app.schemas.show import SShowOutput
 
 lg = logging.getLogger(__name__)
 

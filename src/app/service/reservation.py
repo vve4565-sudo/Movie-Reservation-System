@@ -1,12 +1,12 @@
-from datetime import UTC, datetime
 import logging
 from dataclasses import dataclass
+from datetime import UTC, datetime
 from uuid import UUID
 
-from exceptions.reservation import ChairAndShowNotMatched, ReservationAlredyExist
-from repository.hall import HallRepository
-from repository.reservation import ReservationRepository
-from repository.show import ShowRepository
+from app.exceptions.reservation import ChairAndShowNotMatched, ReservationAlredyExist
+from app.repository.hall import HallRepository
+from app.repository.reservation import ReservationRepository
+from app.repository.show import ShowRepository
 
 lg = logging.getLogger(__name__)
 

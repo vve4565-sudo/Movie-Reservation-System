@@ -1,10 +1,11 @@
 import logging
 from dataclasses import dataclass
 
-from database.models import Roles, User
-from schemas.auth import AuthCreds, HashedAuthCreds, HashedCredentials
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.database.models import Roles, User
+from app.schemas.auth import AuthCreds, HashedCredentials
 
 lg = logging.getLogger(__name__)
 

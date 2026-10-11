@@ -5,21 +5,29 @@ from functools import wraps
 from types import FunctionType
 from uuid import UUID
 
-from config.config import config
 from pydantic import TypeAdapter
 from redis.asyncio import Redis
-from schemas.movie import SOutputMovie
-from schemas.show import SShowOutput
+
+from app.config.config import config
+from app.schemas.movie import SOutputMovie
+from app.schemas.show import SShowOutput
 
 lg = logging.getLogger(__name__)
 
 rate_limiter_redis = Redis(
-    decode_responses=True, retry_on_timeout=True, port=config.REDIS_PORT
+    decode_responses=True,
+    retry_on_timeout=True,
+    port=config.REDIS_PORT,
+    host=config.REDIS_HOST,
 )
 
 
 cache_movie_redis = Redis(
-    db=1, decode_responses=True, retry_on_timeout=True, port=config.REDIS_PORT
+    db=1,
+    decode_responses=True,
+    retry_on_timeout=True,
+    port=config.REDIS_PORT,
+    host=config.REDIS_HOST,
 )
 movie_adapter = TypeAdapter(list[SOutputMovie])
 

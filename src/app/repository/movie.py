@@ -2,11 +2,11 @@ import logging
 from dataclasses import dataclass
 from uuid import UUID
 
-from config.config import config
-from database.models import Movie
-from schemas.movie import MoviePatch, NewMovie
 from sqlalchemy import delete, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.database.models import Movie
+from app.schemas.movie import MoviePatch, NewMovie
 
 lg = logging.getLogger(__name__)
 

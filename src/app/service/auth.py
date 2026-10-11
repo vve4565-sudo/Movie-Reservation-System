@@ -1,12 +1,17 @@
 import logging
 from dataclasses import dataclass
 
-from config.security import dummy_hash, hash_password, verify_password
-from database.models import User
-from exceptions.auth import UserAlreadyExists, UserNotExists, WrongPassword
-from repository.user import UserRepository
-from schemas.auth import AuthCreds, FullCredentials, HashedAuthCreds, HashedCredentials
 from sqlalchemy.exc import IntegrityError
+
+from app.config.security import dummy_hash, hash_password, verify_password
+from app.database.models import User
+from app.exceptions.auth import UserAlreadyExists, UserNotExists, WrongPassword
+from app.repository.user import UserRepository
+from app.schemas.auth import (
+    AuthCreds,
+    FullCredentials,
+    HashedCredentials,
+)
 
 lg = logging.getLogger(__name__)
 
@@ -24,7 +29,10 @@ class AuthService:
         )
 
         try:
-            lg.info("create user with data", extra=new_credentials.model_dump(exclude={'password_hash'}))
+            lg.info(
+                "create user with data",
+                extra=new_credentials.model_dump(exclude={"password_hash"}),
+            )
             user = await self.UserRepository.create_new_user(new_credentials)
             lg.info("success user create", extra={"id": user.id})
             return user

@@ -3,10 +3,11 @@ from dataclasses import dataclass
 from datetime import datetime
 from uuid import UUID
 
-from database.models import Reservation, Show
 from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
+
+from app.database.models import Reservation, Show
 
 lg = logging.getLogger(__name__)
 
@@ -48,7 +49,6 @@ class ReservationRepository:
         lg.info("select reservation by show_id")
         query = (
             select(Reservation)
-
             .options(
                 joinedload(Reservation.chair),
                 joinedload(Reservation.show).joinedload(Show.movie),

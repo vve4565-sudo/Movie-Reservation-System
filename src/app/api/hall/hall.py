@@ -1,10 +1,11 @@
 import logging
 from typing import Annotated
 
-from api.Depends import get_hall_service
 from fastapi import APIRouter, Depends
-from schemas.hall import SHallOutput
-from service.hall import HallService
+
+from app.api.Depends import get_hall_service
+from app.schemas.hall import SHallOutput
+from app.service.hall import HallService
 
 lg = logging.getLogger(__name__)
 

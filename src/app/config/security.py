@@ -3,8 +3,9 @@ from datetime import UTC, datetime, timezone
 from uuid import UUID
 
 import jwt
-from config.config import config
 from pwdlib import PasswordHash
+
+from app.config.config import config
 
 password_hash: PasswordHash = PasswordHash.recommended()
 dummy_hash: str = password_hash.hash("Meshuggah-Bleed")

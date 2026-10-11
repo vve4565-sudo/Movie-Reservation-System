@@ -4,18 +4,19 @@ from dataclasses import dataclass
 from uuid import UUID, uuid4
 
 from aiofiles import open
-from config.config import ROOT_DIR, config
-from config.redis import invalidate_movie_cache, movie_cache
-from database.models import Movie
-from exceptions.movie import (
+from fastapi.responses import FileResponse
+
+from app.config.config import config
+from app.config.redis import invalidate_movie_cache, movie_cache
+from app.database.models import Movie
+from app.exceptions.movie import (
     ImageSaveError,
     InvalidImageExtensionError,
     MovieImageNotExists,
     MovieNotExists,
 )
-from fastapi.responses import FileResponse
-from repository.movie import MovieRepository
-from schemas.movie import (
+from app.repository.movie import MovieRepository
+from app.schemas.movie import (
     MovieImage,
     MovieImagePatch,
     MoviePatch,

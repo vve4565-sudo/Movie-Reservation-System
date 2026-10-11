@@ -2,23 +2,23 @@ import logging
 from typing import Annotated
 from uuid import UUID
 
-from api.Depends import current_user_is_admin, get_movie_service
-from database.models import User
-from exceptions.movie import (
+from fastapi import APIRouter, Depends, Form, HTTPException, UploadFile, status
+
+from app.api.Depends import current_user_is_admin, get_movie_service
+from app.database.models import User
+from app.exceptions.movie import (
     ImageSaveError,
     InvalidImageExtensionError,
     MovieImageNotExists,
 )
-from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
-from fastapi.responses import FileResponse
-from schemas.movie import (
+from app.schemas.movie import (
     MovieImage,
     MovieImagePatch,
     MoviePatch,
     NewMovie,
     SOutputMovie,
 )
-from service.movie import MovieService
+from app.service.movie import MovieService
 
 router = APIRouter(prefix="/movies", tags=["movie"])
 lg = logging.getLogger(__name__)
@@ -47,7 +47,7 @@ async def new_movie(
     movie_service: Annotated[MovieService, Depends(get_movie_service)],
     length: Annotated[int, Form()],
 ):
-    if image.size > 200:  # type: ignore
+    if image.size > 1_048_576:  # type: ignore
         raise HTTPException(
             status.HTTP_400_BAD_REQUEST, detail="image size must be less than 200 mb"
         )

@@ -1,7 +1,8 @@
 from uuid import UUID
 
-from database.models import Roles
 from pydantic import EmailStr
+
+from app.database.models import Roles
 
 from .base import Base
 

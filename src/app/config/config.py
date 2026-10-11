@@ -8,6 +8,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 ROOT_DIR = Path(__file__).resolve().parents[3]
 
+Path(ROOT_DIR / "storage").mkdir(parents=True, exist_ok=True)
+
 
 class Config(BaseSettings):
     model_config = SettingsConfigDict(
@@ -48,6 +50,7 @@ class Config(BaseSettings):
     BASE_STORAGE_URL: Path = ROOT_DIR / "storage"
 
     REDIS_PORT: int
+    REDIS_HOST: str
 
 
 class LOGGER_LEVEL(StrEnum):

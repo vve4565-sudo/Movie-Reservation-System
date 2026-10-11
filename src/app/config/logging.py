@@ -1,7 +1,7 @@
 from logging import getLogger
 from logging.config import dictConfig
 
-from config.config import LOGGER_LEVEL, LOGGING_CONFIG
+from app.config.config import LOGGER_LEVEL, LOGGING_CONFIG
 
 dictConfig(LOGGING_CONFIG)
 
