@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="ru">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CINEMA — Билеты в кино</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <header class="header">
+    <a class="logo" href="#"><span class="logo-mark">C</span>CINEMA</a>
+    <nav>
+      <a href="#movies">Фильмы</a>
+      <a href="#how">Как это работает</a>
+      <a href="admin.html" id="adminLink" hidden>Админ-панель</a>
+    </nav>
+    <div class="header-actions">
+      <button class="register-btn" id="registerBtn" type="button">Регистрация</button>
+      <button class="login-btn" id="loginBtn" type="button"><span class="login-btn-text">Войти</span></button>
+      <button class="login-btn" id="myReservationsBtn" type="button" hidden>Мои бронирования</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-copy">
+        <div class="eyebrow">КИНО НА БОЛЬШОМ ЭКРАНЕ</div>
+        <h1>Выбирай фильм.<br><span>Бронируй место.</span><br>Наслаждайся кино.</h1>
+        <p>Актуальные фильмы и сеансы в одном месте. Выберите фильм, время и кресло — билет будет у вас за пару минут.
+        </p>
+        <div class="hero-actions">
+          <a class="primary-btn" href="#movies">Смотреть фильмы <span>→</span></a>
+          <a class="text-btn" href="#movies">Все фильмы</a>
+        </div>
+      </div>
+      <div class="hero-art" aria-hidden="true">
+        <div class="screen-glow"></div>
+        <div class="ticket-shape">
+          <span class="ticket-hole"></span>
+          <strong>CINEMA</strong>
+          <small>YOUR NIGHT. YOUR MOVIE.</small>
+        </div>
+        <div class="film-reel reel-1"></div>
+        <div class="film-reel reel-2"></div>
+      </div>
+    </section>
+
+    <section class="section" id="movies">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">СЕЙЧАС В КИНО</div>
+          <h2>Фильмы</h2>
+        </div>
+        <div class="filters">
+          <button class="filter active" data-genre="all">Все</button>
+          <button class="filter" data-genre="Фантастика">Фантастика</button>
+          <button class="filter" data-genre="Драма">Драма</button>
+          <button class="filter" data-genre="Комедия">Комедия</button>
+        </div>
+      </div>
+      <div class="movie-grid" id="movieGrid"></div>
+    </section>
+
+    <section class="movie-page section" id="moviePage" hidden>
+      <button class="back-btn" id="backToMovies" type="button">← Все фильмы</button>
+      <div class="movie-detail" id="movieDetail"></div>
+
+      <div class="section-head movie-shows-head">
+        <div>
+          <div class="eyebrow">ДОСТУПНЫЕ СЕАНСЫ</div>
+          <h2>Выберите дату и время</h2>
+        </div>
+        <div class="date-filter">
+          <label>С
+            <input type="date" id="startDate">
+          </label>
+        </div>
+      </div>
+      <div class="show-list" id="movieShowList"></div>
+    </section>
+
+    <section class="how section" id="how">
+      <div class="eyebrow">ПРОСТО И БЫСТРО</div>
+      <h2>Как это работает</h2>
+      <div class="steps">
+        <article><b>01</b>
+          <h3>Выберите фильм</h3>
+          <p>Посмотрите карточки фильмов и откройте нужный сеанс.</p>
+        </article>
+        <article><b>02</b>
+          <h3>Выберите место</h3>
+          <p>Свободные кресла отображаются прямо на схеме зала.</p>
+        </article>
+        <article><b>03</b>
+          <h3>Забронируйте</h3>
+          <p>Авторизуйтесь и подтвердите бронирование билета.</p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="logo"><span class="logo-mark">C</span>CINEMA</div>
+    <span>© 2026 Cinema. Хорошего просмотра.</span>
+  </footer>
+
+  <dialog id="bookingDialog">
+    <form method="dialog" class="modal">
+      <button class="close" value="cancel" aria-label="Закрыть">×</button>
+      <div class="eyebrow">БРОНИРОВАНИЕ</div>
+      <h2 id="modalTitle">Выберите место</h2>
+      <p class="modal-subtitle" id="modalShow"></p>
+      <div class="seat-map" id="seatMap"></div>
+      <div class="legend"><span><i class="seat free"></i> Свободно</span><span><i class="seat selected"></i>
+          Выбрано</span><span><i class="seat busy"></i> Занято</span></div>
+      <button class="primary-btn full" id="confirmBtn" value="default" type="button">Забронировать</button>
+    </form>
+  </dialog>
+
+  <dialog id="reservationsDialog">
+    <div class="modal reservations-modal">
+      <button class="close" type="button" data-close-reservations aria-label="Закрыть">×</button>
+      <div class="eyebrow">МОИ БРОНИРОВАНИЯ</div>
+      <h2>Ваши сеансы</h2>
+      <div class="reservation-list" id="reservationsList"></div>
+    </div>
+  </dialog>
+
+  <dialog id="loginDialog">
+    <form class="modal" id="loginForm">
+      <button class="close" type="button" onclick="loginDialog.close()">×</button>
+      <div class="eyebrow">ЛИЧНЫЙ КАБИНЕТ</div>
+      <h2>Войти</h2>
+      <label>Email<input name="email" type="email" required placeholder="you@example.com"></label>
+      <label>Пароль<input name="password" type="password" required placeholder="••••••••"></label>
+      <button class="primary-btn full" type="submit">Войти</button>
+      <button class="text-btn register-link" id="openRegisterBtn" type="button">Нет аккаунта? Зарегистрироваться</button>
+      <p class="form-note" id="loginNote"></p>
+    </form>
+  </dialog>
+
+  <dialog id="registerDialog">
+    <form class="modal" id="registerForm">
+      <button class="close" type="button" onclick="registerDialog.close()">×</button>
+      <div class="eyebrow">НОВЫЙ АККАУНТ</div>
+      <h2>Регистрация</h2>
+      <label>Имя<input name="nickname" type="text" required placeholder="Ваше имя"></label>
+      <label>Email<input name="email" type="email" required placeholder="you@example.com"></label>
+      <label>Пароль<input name="password" type="password" required placeholder="••••••••"></label>
+      <button class="primary-btn full" type="submit">Создать аккаунт</button>
+      <p class="form-note" id="registerNote"></p>
+    </form>
+  </dialog>
+
+  <script src="api-client.js"></script>
+  <script src="script.js"></script>
+</body>
+
+</html>
