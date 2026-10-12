@@ -8,14 +8,8 @@
 При ответе API `401` или `403` с `Token expired` клиент запрашивает новый access-токен
 через `/auth/refresh` и один раз повторяет исходный запрос.
 
-## Запуск
-Откройте `index.html` в браузере.
-
-## Подключение FastAPI
-В `script.js` задайте:
-`const API_BASE = "http://localhost:8000";`
-
 Лендинг учитывает эндпоинты из предоставленной OpenAPI-схемы:
+
 - POST /auth/login
 - POST /auth/registration
 - GET /auth/logout
