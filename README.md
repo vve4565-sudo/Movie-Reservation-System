@@ -170,32 +170,29 @@ movie-reservation-system/
 
 ## Запуск проекта
 
-### Установка зависимостей
-
-```bash
-uv sync
-```
-
-### Запуск баз данных через Docker
-
 ```bash
 docker compose up -d
-```
-
-### Запуск сервера
-
-```bash
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 ### Пример файла окружения
 
 ```bash
-POSTGRES_DB=movie_reservation
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=postgres
-DATABASE_URL=postgresql+asyncpg://postgres:postgres@localhost:5433/movie_reservation
-REDIS_URL=redis://localhost:6379/0
+DATABASE_SCHEME=postgresql+asyncpg
+DATABASE_PASSWORD=1efd853feda29fbb90ba4bd00c38e893
+DATABASE_USER=Admin
+DATABASE_PATH=MovieReservation
+DATABASE_HOST=database
+DATABASE_PORT=5432
+
+SUPERUSER_NAME=SUPERUSER
+SUPERUSER_EMAIL=example@email.com
+SUPERUSER_PASSWORD=1efd853feda29fbb90ba4bd00c38e893
+
+JWT_SECRET_KEY=GrayHeavenFall_Изгой_лживых_образов_икон
+CRYPT_ALGORITHM=HS256
+
+REDIS_HOST=redis
+REDIS_PORT=6379
 ```
 
 ## Тестирование
@@ -211,24 +208,10 @@ uv run pytest
 
 ## Планы по доработке
 
-### CI/CD
-
-- Добавить автоматическую проверку качества кода на каждом pull request
-- Настроить сборку и запуск тестов в CI/CD пайплайне
-- Автоматизировать деплой приложения и миграций базы данных
-- Подключить статический анализ кода и форматирование
-
-### Мониторинг и наблюдаемость
-
+- Настроить сборку и запуск тестов в CI/CD
 - Подключить Prometheus для сбора метрик приложения и инфраструктуры
 - Настроить Grafana для визуализации метрик и дашбордов
 - Добавить метрики по количеству запросов, времени ответа, ошибкам и загрузке Redis/PostgreSQL
-- Настроить алерты для перегрузки сервиса и падения зависимостей
-
-### Дальнейшее развитие продукта
-
-- Добавить административную панель с более удобным управлением фильмами и сеансами
 - Реализовать фильтрацию и поиск по фильмам, жанрам и датам
-- Добавить поддержку нескольких кинотеатров и залов
 - Расширить функциональность уведомлений и отчётности
 - Увеличить покрытие интеграционными и end-to-end тестами
