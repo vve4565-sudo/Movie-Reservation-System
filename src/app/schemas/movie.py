@@ -30,6 +30,7 @@ class MoviePatch(Base):
     description: str | None = None
     genre: str | None = None
     director: str | None = None
+    length: int | None = None
 
 
 class MovieImagePatch(Base):

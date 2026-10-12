@@ -89,12 +89,12 @@ class MovieService:
             try:
                 if image.image:
                     async with open(
-                        config.BASE_STORAGE_URL / old_data.title, mode="wb"
+                        config.BASE_STORAGE_URL / old_data.image, mode="wb"
                     ) as f:
                         await f.write(image.image)
-                    lg.info("image patched", extra={"title": old_data.title})
+                    lg.info("image patched", extra={"image title": old_data.image})
             except Exception:
-                lg.exception("image patch error", extra={"title": old_data.title})
+                lg.exception("image patch error", extra={"image title": old_data.image})
                 raise ImageSaveError("Image save error")
 
         if data:
