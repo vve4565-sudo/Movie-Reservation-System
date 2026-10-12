@@ -217,3 +217,4 @@ uv run pytest
 - Реализовать фильтрацию и поиск по фильмам, жанрам и датам
 - Расширить функциональность уведомлений и отчётности
 - Увеличить покрытие интеграционными и end-to-end тестами
+###### [roadmap.sh/projects/movie-reservation-system](https://roadmap.sh/projects/movie-reservation-system)
