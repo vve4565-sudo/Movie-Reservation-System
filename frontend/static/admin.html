@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="ru">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CINEMA — Админ-панель</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="admin.css">
+</head>
+
+<body>
+  <header class="header">
+    <a class="logo" href="index.html"><span class="logo-mark">C</span>CINEMA</a>
+    <nav>
+      <a href="#movies">Фильмы</a>
+      <a href="#admin">Управление</a>
+      <a href="index.html">Страница кинотеатра</a>
+    </nav>
+    <div class="header-actions">
+      <button class="login-btn" id="loginBtn" type="button"><span class="login-btn-text">Войти</span></button>
+      <button class="login-btn" id="myReservationsBtn" type="button" hidden>Мои бронирования</button>
+      <button class="login-btn" id="adminLogout" type="button" hidden>Выйти</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero admin-hero">
+      <div class="hero-copy">
+        <div class="eyebrow">CINEMA · ADMIN</div>
+        <h1>Кинотеатр.<br><span>Под вашим</span><br>контролем.</h1>
+        <p>Здесь доступны пользовательская витрина и инструменты администратора: управляйте фильмами, сеансами и бронированиями.</p>
+        <div class="hero-actions">
+          <a class="primary-btn" href="#admin">Открыть панель <span>→</span></a>
+          <a class="text-btn" href="index.html">Страница кинотеатра</a>
+        </div>
+      </div>
+      <div class="admin-hero-card" aria-hidden="true">
+        <span class="admin-card-icon">C</span>
+        <strong>ADMIN<br>CONTROL</strong>
+        <span class="admin-card-line"></span>
+        <small>УПРАВЛЕНИЕ КИНОТЕАТРОМ</small>
+      </div>
+    </section>
+
+    <section class="section" id="movies">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">КАК В КИНОТЕАТРЕ</div>
+          <h2>Фильмы</h2>
+        </div>
+        <div class="filters">
+          <button class="filter active" data-genre="all">Все</button>
+          <button class="filter" data-genre="Фантастика">Фантастика</button>
+          <button class="filter" data-genre="Драма">Драма</button>
+          <button class="filter" data-genre="Комедия">Комедия</button>
+        </div>
+      </div>
+      <div class="movie-grid" id="movieGrid"></div>
+    </section>
+
+    <section class="movie-page section" id="moviePage" hidden>
+      <button class="back-btn" id="backToMovies" type="button">← Все фильмы</button>
+      <div class="movie-detail" id="movieDetail"></div>
+      <div class="section-head movie-shows-head">
+        <div>
+          <div class="eyebrow">ДОСТУПНЫЕ СЕАНСЫ</div>
+          <h2>Выберите дату и время</h2>
+        </div>
+        <div class="date-filter">
+          <label>С <input type="date" id="startDate"></label>
+        </div>
+      </div>
+      <div class="show-list" id="movieShowList"></div>
+    </section>
+
+    <section class="how section" id="how">
+      <div class="eyebrow">ПРОСТО И БЫСТРО</div>
+      <h2>Как это работает</h2>
+      <div class="steps">
+        <article><b>01</b><h3>Выберите фильм</h3><p>Откройте карточку фильма и выберите доступный сеанс.</p></article>
+        <article><b>02</b><h3>Выберите место</h3><p>Свободные кресла отображаются на схеме зала.</p></article>
+        <article><b>03</b><h3>Забронируйте</h3><p>Подтвердите выбранное место после авторизации.</p></article>
+      </div>
+    </section>
+
+    <section class="section admin-section" id="admin">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">ТОЛЬКО ДЛЯ АДМИНИСТРАТОРА</div>
+          <h2>Управление</h2>
+        </div>
+        <button class="login-btn" id="refreshAdmin" type="button">Обновить данные</button>
+      </div>
+      <div class="admin-access" id="adminAccess" role="status">Войдите в аккаунт администратора, чтобы открыть панель управления.</div>
+      <div id="adminWorkspace" hidden>
+        <div class="admin-stats" id="adminStats"></div>
+
+        <div class="admin-grid">
+          <article class="admin-card">
+            <div class="admin-card-head">
+              <div><div class="eyebrow">КАТАЛОГ</div><h3 id="movieFormTitle">Добавить фильм</h3></div>
+            </div>
+            <form id="movieForm" class="admin-form">
+              <label>Название<input name="title" required maxlength="200" placeholder="Название фильма"></label>
+              <div class="form-row">
+                <label>Жанр<input name="genre" required placeholder="Драма"></label>
+                <label>Режиссёр<input name="director" required placeholder="Имя режиссёра"></label>
+              </div>
+              <label>Описание<textarea name="description" required rows="3" placeholder="Краткое описание"></textarea></label>
+              <div class="form-row">
+                <label>Длительность, минут<input name="duration" type="number" min="1" max="600" value="120" required></label>
+                <label>Постер<input name="image" type="file" accept="image/png,image/jpeg,image/x-icon"></label>
+              </div>
+              <p class="admin-message" id="movieEditNote" hidden></p>
+              <div class="movie-form-actions">
+                <button class="primary-btn" id="movieSubmit" type="submit">Добавить фильм <span>＋</span></button>
+                <button class="login-btn" id="cancelMovieEdit" type="button" hidden>Отменить</button>
+              </div>
+              <p class="admin-message" id="movieMessage" aria-live="polite"></p>
+            </form>
+          </article>
+
+          <article class="admin-card">
+            <div class="admin-card-head">
+              <div><div class="eyebrow">РАСПИСАНИЕ</div><h3>Создать сеанс</h3></div>
+            </div>
+            <form id="showForm" class="admin-form">
+              <label>Фильм<select name="movie_id" id="showMovie" required></select></label>
+              <label>Зал<select name="hall_id" id="showHall" required></select></label>
+              <div class="show-date-time">
+                <div class="show-date-block">
+                  <label for="showDate">Дата сеанса</label>
+                  <input id="showDate" name="date" type="date" lang="ru" required>
+                </div>
+                <div class="show-time-block">
+                  <label for="showTime">Время начала</label>
+                  <input id="showTime" name="time" type="text" inputmode="text" placeholder="ЧЧ:ММ"
+                    pattern="([01][0-9]|2[0-3]):[0-5][0-9]" maxlength="5" autocomplete="off"
+                    title="Введите время в 24-часовом формате, например 17:30" required>
+                </div>
+              </div>
+              <p class="show-time-preview" id="showTimePreview" aria-live="polite">Выберите дату и время начала сеанса.</p>
+              <p class="show-time-hint">Время указано по часовому поясу вашего устройства.</p>
+              <button class="primary-btn" type="submit">Создать сеанс <span>＋</span></button>
+              <p class="admin-message" id="showMessage" aria-live="polite"></p>
+            </form>
+          </article>
+        </div>
+
+        <article class="admin-card admin-table-card">
+          <div class="admin-card-head">
+            <div><div class="eyebrow">КАТАЛОГ</div><h3>Фильмы в системе</h3></div>
+          </div>
+          <div class="admin-table-wrap"><table><thead><tr><th>Фильм</th><th>Жанр</th><th>Режиссёр</th><th></th></tr></thead><tbody id="adminMovies"></tbody></table></div>
+        </article>
+
+        <article class="admin-card admin-table-card">
+          <div class="admin-card-head">
+            <div><div class="eyebrow">РАСПИСАНИЕ</div><h3>Ближайшие сеансы</h3></div>
+          </div>
+          <div class="admin-table-wrap"><table><thead><tr><th>Фильм</th><th>Дата и время</th><th>Зал</th><th></th></tr></thead><tbody id="adminShows"></tbody></table></div>
+        </article>
+
+        <article class="admin-card admin-table-card">
+          <div class="admin-card-head">
+            <div><div class="eyebrow">БРОНИРОВАНИЯ</div><h3>Все брони</h3></div>
+          </div>
+          <div class="admin-table-wrap"><table><thead><tr><th>Фильм и сеанс</th><th>Пользователь</th><th>Место</th><th></th></tr></thead><tbody id="adminReservations"></tbody></table></div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="logo"><span class="logo-mark">C</span>CINEMA</div>
+    <span>© 2026 Cinema. Хорошего просмотра.</span>
+  </footer>
+
+  <dialog id="bookingDialog">
+    <form method="dialog" class="modal">
+      <button class="close" value="cancel" aria-label="Закрыть">×</button>
+      <div class="eyebrow">БРОНИРОВАНИЕ</div>
+      <h2 id="modalTitle">Выберите место</h2>
+      <p class="modal-subtitle" id="modalShow"></p>
+      <div class="seat-map" id="seatMap"></div>
+      <div class="legend"><span><i class="seat free"></i> Свободно</span><span><i class="seat selected"></i> Выбрано</span><span><i class="seat busy"></i> Занято</span></div>
+      <button class="primary-btn full" id="confirmBtn" value="default" type="button">Забронировать</button>
+    </form>
+  </dialog>
+
+  <dialog id="reservationsDialog">
+    <div class="modal reservations-modal">
+      <button class="close" type="button" data-close-reservations aria-label="Закрыть">×</button>
+      <div class="eyebrow">МОИ БРОНИРОВАНИЯ</div>
+      <h2>Ваши сеансы</h2>
+      <div class="reservation-list" id="reservationsList"></div>
+    </div>
+  </dialog>
+
+  <dialog id="loginDialog">
+    <form class="modal" id="loginForm">
+      <button class="close" type="button" onclick="loginDialog.close()">×</button>
+      <div class="eyebrow">ЛИЧНЫЙ КАБИНЕТ</div>
+      <h2>Войти</h2>
+      <label>Email<input name="email" type="email" required placeholder="you@example.com"></label>
+      <label>Пароль<input name="password" type="password" required placeholder="••••••••"></label>
+      <button class="primary-btn full" type="submit">Войти</button>
+      <p class="form-note" id="loginNote"></p>
+    </form>
+  </dialog>
+
+  <script src="api-client.js"></script>
+  <script src="script.js"></script>
+  <script src="admin.js"></script>
+</body>
+
+</html>
